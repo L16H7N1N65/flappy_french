@@ -253,3 +253,16 @@ def main():
         clock.tick(60)
 
     pygame.quit()
+    
+    ## Note my self 
+    ## restrain birds to a fixed sized 
+    ## Pipes logic isnt working -- to be fixed !
+    ## Add button to be checked for warnings about usages and conditions
+    ## modify bird mov from mouse to keyup and keydown 
+    ## redefine pop up when the game is lost 
+    ## Birds shall be centered on start 4 x 4
+    ## Generate sounds for flap and >>
+    ## Create sound when the game is lost 
+    ## Create background 
+    
+    
