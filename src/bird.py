@@ -1,3 +1,5 @@
+## bird.py
+
 import pygame
 
 class Bird(pygame.sprite.Sprite):
@@ -16,8 +18,8 @@ class Bird(pygame.sprite.Sprite):
         if self.rect.top <= 0:
             self.rect.top = 0
             self.velocity = 0
-        elif self.rect.bottom >= HEIGHT:
-            self.rect.bottom = HEIGHT
+        elif self.rect.bottom >= 600:  # Assuming screen height is 600
+            self.rect.bottom = 600
             self.velocity = 0
 
     def jump(self):

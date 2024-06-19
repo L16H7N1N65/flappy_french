@@ -1,3 +1,5 @@
+## pipe.py
+
 import pygame
 
 class Pipe(pygame.sprite.Sprite):
@@ -10,4 +12,6 @@ class Pipe(pygame.sprite.Sprite):
     def update(self):
         self.rect.x -= self.speed
 
-        # Add logic to reset position or re-generate pipes off-screen
+        # Add logic to reset position or re-generate pipes off-screen if necessary
+        if self.rect.right < 0:
+            self.kill()
