@@ -77,17 +77,19 @@ def draw_start_screen(screen):
 
 def draw_bird_selection_screen(screen, bird_images):
     screen.fill(BACKGROUND_COLOR)
-    draw_text("Select Your Bird", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)
+    draw_text("Select Your Bird", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)  # to be updated
 
     button_width, button_height = 120, 60
-    button_x = WIDTH // 2 - (button_width * 4) // 2
-    button_y = HEIGHT // 2
     for i in range(len(bird_images)):
-        pygame.draw.rect(screen, (255, 255, 255), (button_x + i * button_width, button_y, button_width, button_height))
-        screen.blit(pygame.transform.scale(bird_images[i], (button_width, button_height)), (button_x + i * button_width, button_y))
+        row = i // 4
+        col = i % 4
+        button_x = (WIDTH // 2 - (button_width * 4 + 30) // 2) + col * (button_width + 10)
+        button_y = HEIGHT // 2 + row * (button_height + 10)
+        pygame.draw.rect(screen, (255, 255, 255), (button_x, button_y, button_width, button_height))
+        screen.blit(pygame.transform.scale(bird_images[i], (button_width, button_height)), (button_x, button_y))
         if selected_bird_index == i:
-            pygame.draw.rect(screen, (255, 0, 0), (button_x + i * button_width, button_y, button_width, button_height), 3)
-    
+            pygame.draw.rect(screen, (255, 0, 0), (button_x, button_y, button_width, button_height), 3)
+
     if mobile_controls:
         draw_mobile_controls(screen)
 
@@ -133,7 +135,7 @@ def start_game():
 
 def select_bird(index):
     global selected_bird_index, bird_image, bird
-    selected_bird_index = index
+    selected_bird_index = index  # update to the selected bird index
     bird_image = bird_images[selected_bird_index]
     bird = Bird(bird_images, (100, HEIGHT // 2))
 
@@ -158,11 +160,12 @@ def generate_pipes(screen):
     pipes_group.draw(screen)
 
 def main():
-    global bird_images, screen, clock, bird, conditions_accepted, mobile_controls
+    global bird_images, screen, clock, bird, conditions_accepted, mobile_controls, selected_bird_index
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
     bird_images = load_images(BIRD_IMAGES)
+    selected_bird_index = 0  # Initialize selected_bird_index
     bird = Bird(bird_images, (100, HEIGHT // 2))
 
     start_screen = True
@@ -243,7 +246,7 @@ def main():
                             difficulty_screen = False
                             game_running = True
 
-        elif game_running:
+        elif game_running: # Carry on here ---------> pygame.event.Event' object has no attribute 'key'
             screen.fill(BACKGROUND_COLOR)
             all_sprites.update()
             all_sprites.draw(screen)
@@ -252,12 +255,21 @@ def main():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                elif event.type == pygame.KEYDOWN: 
+                    if event.key == pygame.K_UP:
+                        bird.rect.y -= 10  
+                elif event.key == pygame.K_DOWN:
+                    bird.rect.y += 10  
+                elif event.key == pygame.K_SPACE:
                     bird.jump()
+                    
+                    
+#               elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+#                  bird.jump()
 
-            if pygame.sprite.spritecollideany(bird, pipes_group):
-                game_running = False
-                game_over = True
+#            if pygame.sprite.spritecollideany(bird, pipes_group):
+#                game_running = False
+#                game_over = True
 
         elif game_over and popup_active:
             draw_game_over_screen(screen)
@@ -287,15 +299,28 @@ def main():
 if __name__ == "__main__":
     main()
     
-    ## Note my self 
-    ## restrain birds to a fixed sized 
-    ## Pipes logic isnt working -- to be fixed !
+    #### Note my self 
+    ## restrain birds to a fixed sized                                       <<<<<<<<<<<< done
+    ## Pipes logic isnt working -- to be fixed !                             <<<<<<<<<<<< done
     ## Add button to be checked for warnings about usages and conditions
     ## modify bird mov from mouse to keyup and keydown 
-    ## redefine pop up when the game is lost 
-    ## Birds shall be centered on start 4 x 4
-    ## Generate sounds for flap and >>
+    ## redefine pop up when the game is lost                                 <<<<<<<<<<<< start again from this point 
+    ## Birds shall be centered on start 4 x 4                                <<<<<<<<<<<< done
+    
+    #### code to be added 
+    ## sounds
+    ## background modify
+    ## floor must be included 
+    
+    ## Generate sounds for flap 
     ## Create sound when the game is lost 
     ## Create background 
+    
+    ## Create a score board
+    ## Create a pause button
+    ## Create a restart button
+    ## Create a stop button
+    ## Create a start button
+    
     
     
