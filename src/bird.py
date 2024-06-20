@@ -11,7 +11,7 @@ class Bird(pygame.sprite.Sprite):
         self.velocity = 0
 
     def update(self):
-        self.velocity += 0.3  # Apply gravity
+        self.velocity += 0.7  # Apply gravity
         self.rect.y += self.velocity
 
         # Limit bird's y position within screen boundaries
@@ -23,7 +23,7 @@ class Bird(pygame.sprite.Sprite):
             self.velocity = 0
 
     def jump(self):
-        self.velocity = -6  # Bird jumps
+        self.velocity = -15  # Bird jumps // Increasing velocity 
 
     def animate(self):
         # Animate bird's wings

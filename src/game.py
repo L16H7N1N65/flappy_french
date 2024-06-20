@@ -1,5 +1,6 @@
 ##game.py
 
+
 import pygame
 import random
 import sys
@@ -21,7 +22,7 @@ BIRD_IMAGES = [
     '../assets/bird/bird7.png',
     '../assets/bird/bird8.png'
 ]
-BIRD_SIZE = (34, 34) # updated here to setup img size
+BIRD_SIZE = (74, 94) # updated here to setup img size
 DIFFICULTIES = {
     'easy': {'gap': 260, 'pipe_speed': 2},
     'hard': {'gap': 195, 'pipe_speed': 3},
@@ -68,7 +69,11 @@ def draw_text(text, font, color, x, y, screen):
 
 def draw_start_screen(screen):
     screen.fill(BACKGROUND_COLOR)
-    draw_text("Welcome to Flappy French", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)
+    logo = pygame.image.load('../assets/logo.png')
+    logo_rect = logo.get_rect(center=(WIDTH // 2, HEIGHT // 4)) 
+    screen.fill(BACKGROUND_COLOR)
+    screen.blit(logo, logo_rect)
+    #draw_text("Welcome to Flappy French", font_large, (0, 0, 0), WIDTH // #2, HEIGHT // 4, screen)
     draw_text("Please accept the usage conditions", font_medium, (0, 0, 0), WIDTH // 2, HEIGHT // 2, screen)
     draw_text("Press SPACE to continue", font_small, (0, 0, 0), WIDTH // 2, HEIGHT * 3 // 4, screen)
     pygame.draw.rect(screen, (0, 0, 0), (WIDTH // 2 - 15, HEIGHT * 3 // 4 + 60, 30, 30), 2)
@@ -258,10 +263,10 @@ def main():
                 elif event.type == pygame.KEYDOWN: 
                     if event.key == pygame.K_UP:
                         bird.rect.y -= 10  
-                elif event.key == pygame.K_DOWN:
-                    bird.rect.y += 10  
-                elif event.key == pygame.K_SPACE:
-                    bird.jump()
+                    elif event.key == pygame.K_DOWN:
+                        bird.rect.y += 10  
+                    elif event.key == pygame.K_SPACE:
+                        bird.jump()
                     
                     
 #               elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
