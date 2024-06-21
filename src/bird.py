@@ -1,5 +1,3 @@
-## bird.py
-
 import pygame
 
 class Bird(pygame.sprite.Sprite):
@@ -9,22 +7,28 @@ class Bird(pygame.sprite.Sprite):
         self.image = self.images[0]
         self.rect = self.image.get_rect(center=initial_position)
         self.velocity = 0
+        self.gravity = 0.9
+        self.jump_velocity = -10
 
     def update(self):
-        self.velocity += 0.7  # Apply gravity
+        self.velocity += self.gravity
         self.rect.y += self.velocity
 
-        # Limit bird's y position within screen boundaries
         if self.rect.top <= 0:
             self.rect.top = 0
             self.velocity = 0
-        elif self.rect.bottom >= 600:  
+        elif self.rect.bottom >= 600:
             self.rect.bottom = 600
             self.velocity = 0
 
+        self.animate()
+
     def jump(self):
-        self.velocity = -15  # Bird jumps // Increasing velocity 
+        self.velocity = self.jump_velocity
 
     def animate(self):
-        # Animate bird's wings
         self.image = self.images[(pygame.time.get_ticks() // 100) % len(self.images)]
+        
+
+
+

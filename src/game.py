@@ -1,6 +1,5 @@
 ##game.py
 
-
 import pygame
 import random
 import sys
@@ -10,19 +9,20 @@ from pipe import Pipe
 
 # Constants
 WIDTH, HEIGHT = 800, 600
-BACKGROUND_COLOR = (112, 197, 206)  # light blue
-PIPE_COLOR = (46, 213, 115)  # green
+BACKGROUND_COLOR = (112, 197, 206)
+PIPE_COLOR = (46, 213, 115)
 BIRD_IMAGES = [
-    '../assets/bird/bird1.png',
-    '../assets/bird/bird2.png',
-    '../assets/bird/bird3.png',
-    '../assets/bird/bird4.png',
-    '../assets/bird/bird5.png',
-    '../assets/bird/bird6.png',
-    '../assets/bird/bird7.png',
-    '../assets/bird/bird8.png'
+    '../assets/birds/bird1.png',
+    '../assets/birds/bird2.png',
+    '../assets/birds/bird3.png',
+    '../assets/birds/bird4.png',
+    '../assets/birds/bird5.png',
+    '../assets/birds/bird6.png',
+    '../assets/birds/bird7.png',
+    '../assets/birds/bird8.png'
 ]
-BIRD_SIZE = (74, 94) # updated here to setup img size
+BIRD_SIZE = (74, 94)
+
 DIFFICULTIES = {
     'easy': {'gap': 260, 'pipe_speed': 2},
     'hard': {'gap': 195, 'pipe_speed': 3},
@@ -40,11 +40,16 @@ game_over = False
 popup_active = False
 conditions_accepted = False
 
+# Blinking related variables
+blink = False
+last_blink_time = 0
+blink_speed = 500
+
 # Initialize Pygame
 pygame.font.init()
 font_large = pygame.font.SysFont('Arial', 50)
 font_medium = pygame.font.SysFont('Arial', 30)
-font_small = pygame.font.SysFont('Arial', 20)
+font_small = pygame.font.SysFont('Arial', 15)
 
 # Sprites
 all_sprites = pygame.sprite.Group()
@@ -67,22 +72,25 @@ def draw_text(text, font, color, x, y, screen):
     text_rect = text_surface.get_rect(center=(x, y))
     screen.blit(text_surface, text_rect)
 
-def draw_start_screen(screen):
-    screen.fill(BACKGROUND_COLOR)
-    logo = pygame.image.load('../assets/logo.png')
-    logo_rect = logo.get_rect(center=(WIDTH // 2, HEIGHT // 4)) 
-    screen.fill(BACKGROUND_COLOR)
+def draw_start_screen(screen, blink):
+    bg_initial = pygame.image.load("../assets/bg_initial.png")
+    bg_initial_scaled = pygame.transform.scale(bg_initial, (WIDTH, HEIGHT))
+    screen.blit(bg_initial_scaled, (0, 0))
+
+    logo = pygame.image.load("../assets/logo.png")
+    logo = pygame.transform.scale(logo, (logo.get_width() // 1.6, logo.get_height() // 1.6))
+    logo_rect = logo.get_rect(topright=(WIDTH - 25, 18))
     screen.blit(logo, logo_rect)
-    #draw_text("Welcome to Flappy French", font_large, (0, 0, 0), WIDTH // #2, HEIGHT // 4, screen)
-    draw_text("Please accept the usage conditions", font_medium, (0, 0, 0), WIDTH // 2, HEIGHT // 2, screen)
-    draw_text("Press SPACE to continue", font_small, (0, 0, 0), WIDTH // 2, HEIGHT * 3 // 4, screen)
-    pygame.draw.rect(screen, (0, 0, 0), (WIDTH // 2 - 15, HEIGHT * 3 // 4 + 60, 30, 30), 2)
-    if conditions_accepted:
-        pygame.draw.line(screen, (0, 0, 0), (WIDTH // 2 - 10, HEIGHT * 3 // 4 + 75), (WIDTH // 2 + 10, HEIGHT * 3 // 4 + 75), 2)
+
+    initial_start = pygame.image.load("../assets/initial_start.png")
+    initial_start = pygame.transform.scale(initial_start, (initial_start.get_width() // 1.6, initial_start.get_height() // 1.6))
+    initial_start_rect = initial_start.get_rect(bottomright=(WIDTH - 25, HEIGHT - 25))
+    if blink:
+        screen.blit(initial_start, initial_start_rect)
 
 def draw_bird_selection_screen(screen, bird_images):
     screen.fill(BACKGROUND_COLOR)
-    draw_text("Select Your Bird", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)  # to be updated
+    draw_text("Select Your Bird", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)
 
     button_width, button_height = 120, 60
     for i in range(len(bird_images)):
@@ -95,23 +103,12 @@ def draw_bird_selection_screen(screen, bird_images):
         if selected_bird_index == i:
             pygame.draw.rect(screen, (255, 0, 0), (button_x, button_y, button_width, button_height), 3)
 
-    if mobile_controls:
-        draw_mobile_controls(screen)
-
-def draw_mobile_controls(screen):
-    control_width, control_height = 50, 50
-    control_y = HEIGHT - 60
-    left_x = WIDTH // 2 - 60
-    right_x = WIDTH // 2 + 10
-    select_x = WIDTH // 2 - 25
-
-    pygame.draw.rect(screen, (0, 0, 0), (left_x, control_y, control_width, control_height), 2)
-    pygame.draw.polygon(screen, (0, 0, 0), [(left_x + 35, control_y + 15), (left_x + 15, control_y + 25), (left_x + 35, control_y + 35)], 2)
-    pygame.draw.rect(screen, (0, 0, 0), (right_x, control_y, control_width, control_height), 2)
-    pygame.draw.polygon(screen, (0, 0, 0), [(right_x + 15, control_y + 15), (right_x + 35, control_y + 25), (right_x + 15, control_y + 35)], 2)
-    pygame.draw.rect(screen, (0, 0, 0), (select_x, control_y, control_width, control_height), 2)
-    draw_text("OK", font_medium, (0, 0, 0), select_x + 25, control_y + 25, screen)
-
+    start_img = pygame.image.load("../assets/start.png")
+    start_img = pygame.transform.scale(start_img, (button_width, button_height))
+    start_img_rect = start_img.get_rect(center=(WIDTH // 2, HEIGHT - 100))
+    screen.blit(start_img, start_img_rect)
+    
+##basic coding works atm 
 def draw_game_over_screen(screen):
     global popup_active
     popup_active = True
@@ -140,9 +137,10 @@ def start_game():
 
 def select_bird(index):
     global selected_bird_index, bird_image, bird
-    selected_bird_index = index  # update to the selected bird index
+    selected_bird_index = index
     bird_image = bird_images[selected_bird_index]
     bird = Bird(bird_images, (100, HEIGHT // 2))
+    start_game()  # Reset game when bird is selected
 
 def set_difficulty(level):
     global difficulty
@@ -165,167 +163,190 @@ def generate_pipes(screen):
     pipes_group.draw(screen)
 
 def main():
-    global bird_images, screen, clock, bird, conditions_accepted, mobile_controls, selected_bird_index
+    global screen, bird_images, clock, bird, selected_bird_index, difficulty, game_over, pipes, score, popup_active, blink, last_blink_time
+
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
     bird_images = load_images(BIRD_IMAGES)
-    selected_bird_index = 0  # Initialize selected_bird_index
+    selected_bird_index = 0  # default bird
     bird = Bird(bird_images, (100, HEIGHT // 2))
 
     start_screen = True
     bird_selection_screen = False
     difficulty_screen = False
     game_running = False
-    mobile_controls = False  
+    blink = False
 
     while True:
-        if start_screen:
-            draw_start_screen(screen)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE and conditions_accepted:
-                        start_screen = False
-                        bird_selection_screen = True
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_x, mouse_y = pygame.mouse.get_pos()
-                    if WIDTH // 2 - 15 <= mouse_x <= WIDTH // 2 + 15 and HEIGHT * 3 // 4 + 60 <= mouse_y <= HEIGHT * 3 // 4 + 90:
-                        conditions_accepted = not conditions_accepted
-
-        elif bird_selection_screen:
-            draw_bird_selection_screen(screen, bird_images)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.KEYDOWN:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if start_screen:
+                    start_screen = False
+                    bird_selection_screen = True
+                elif bird_selection_screen:
                     if event.key == pygame.K_LEFT:
                         selected_bird_index = (selected_bird_index - 1) % len(bird_images)
                     elif event.key == pygame.K_RIGHT:
                         selected_bird_index = (selected_bird_index + 1) % len(bird_images)
                     elif event.key == pygame.K_RETURN:
-                        select_bird(selected_bird_index)
                         bird_selection_screen = False
                         difficulty_screen = True
-                elif mobile_controls and event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_x, mouse_y = pygame.mouse.get_pos()
-                    control_width, control_height = 50, 50
-                    control_y = HEIGHT - 60
-                    left_x = WIDTH // 2 - 60
-                    right_x = WIDTH // 2 + 10
-                    select_x = WIDTH // 2 - 25
-
-                    if left_x <= mouse_x <= left_x + control_width and control_y <= mouse_y <= control_y + control_height:
-                        selected_bird_index = (selected_bird_index - 1) % len(bird_images)
-                    elif right_x <= mouse_x <= right_x + control_width and control_y <= mouse_y <= control_y + control_height:
-                        selected_bird_index = (selected_bird_index + 1) % len(bird_images)
-                    elif select_x <= mouse_x <= select_x + control_width and control_y <= mouse_y <= control_y + control_height:
                         select_bird(selected_bird_index)
+                elif difficulty_screen:
+                    if event.key == pygame.K_UP:
+                        set_difficulty('easy')
+                        difficulty_screen = False
+                        game_running = True
+                    elif event.key == pygame.K_DOWN:
+                        set_difficulty('advanced')
+                        difficulty_screen = False
+                        game_running = True
+                    elif event.key == pygame.K_RIGHT:
+                        set_difficulty('hard')
+                        difficulty_screen = False
+                        game_running = True
+                elif game_running:
+                    if event.key == pygame.K_SPACE:
+                        bird.jump()
+                elif game_over and popup_active:
+                    if event.key == pygame.K_RETURN:
+                        popup_active = False
+                        start_screen = True
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if start_screen:
+                    start_screen = False
+                    bird_selection_screen = True
+                elif bird_selection_screen:
+                    x, y = event.pos
+                    button_width, button_height = 120, 60
+                    for i in range(len(bird_images)):
+                        row = i // 4
+                        col = i % 4
+                        button_x = (WIDTH // 2 - (button_width * 4 + 30) // 2) + col * (button_width + 10)
+                        button_y = HEIGHT // 2 + row * (button_height + 10)
+                        if button_x <= x <= button_x + button_width and button_y <= y <= button_y + button_height:
+                            select_bird(i)
+                    start_img_rect = pygame.Rect((WIDTH // 2 - button_width // 2, HEIGHT - 100, button_width, button_height))
+                    if start_img_rect.collidepoint(event.pos):
                         bird_selection_screen = False
                         difficulty_screen = True
+                elif difficulty_screen:
+                    easy_rect = pygame.Rect(WIDTH // 4, HEIGHT // 2 - 30, WIDTH // 2, 60)
+                    hard_rect = pygame.Rect(WIDTH // 4, HEIGHT // 2 + 40, WIDTH // 2, 60)
+                    advanced_rect = pygame.Rect(WIDTH // 4, HEIGHT // 2 + 110, WIDTH // 2, 60)
+                    if easy_rect.collidepoint(event.pos):
+                        set_difficulty('easy')
+                        difficulty_screen = False
+                        game_running = True
+                    elif hard_rect.collidepoint(event.pos):
+                        set_difficulty('hard')
+                        difficulty_screen = False
+                        game_running = True
+                    elif advanced_rect.collidepoint(event.pos):
+                        set_difficulty('advanced')
+                        difficulty_screen = False
+                        game_running = True
+                elif game_over and popup_active:
+                    x, y = event.pos
+                    if WIDTH // 4 <= x <= WIDTH // 4 + WIDTH // 2:
+                        if HEIGHT * 3 // 4 - 50 <= y <= HEIGHT * 3 // 4:
+                            # Download PDF logic here
+                            webbrowser.open('path_to_pdf')
+                        elif HEIGHT * 3 // 4 + 10 <= y <= HEIGHT * 3 // 4 + 60:
+                            # Restart game
+                            start_game()
+                            game_running = True
+                            popup_active = False
+                        elif HEIGHT * 3 // 4 + 70 <= y <= HEIGHT * 3 // 4 + 120:
+                            pygame.quit()
+                            sys.exit()
+                        elif HEIGHT * 3 // 4 + 130 <= y <= HEIGHT * 3 // 4 + 180:
+                            # Open website
+                            webbrowser.open('https://example.com')
 
+        if start_screen:
+            current_time = pygame.time.get_ticks()
+            if current_time - last_blink_time >= blink_speed:
+                blink = not blink
+                last_blink_time = current_time
+            draw_start_screen(screen, blink)
+        elif bird_selection_screen:
+            draw_bird_selection_screen(screen, bird_images)
         elif difficulty_screen:
             screen.fill(BACKGROUND_COLOR)
             draw_text("Select Difficulty", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)
-            button_width, button_height = 200, 60
-            for idx, level in enumerate(DIFFICULTIES.keys()):
-                button_x = WIDTH // 2 - button_width // 2
-                button_y = HEIGHT // 2 + idx * (button_height + 20)
-                pygame.draw.rect(screen, (255, 0, 0), (button_x, button_y, button_width, button_height))
-                draw_text(level.capitalize(), font_medium, (255, 255, 255), WIDTH // 2, button_y + button_height // 2, screen)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_x, mouse_y = pygame.mouse.get_pos()
-                    for idx, level in enumerate(DIFFICULTIES.keys()):
-                        button_x = WIDTH // 2 - button_width // 2
-                        button_y = HEIGHT // 2 + idx * (button_height + 20)
-                        if button_x <= mouse_x <= button_x + button_width and button_y <= mouse_y <= button_y + button_height:
-                            set_difficulty(level)
-                            difficulty_screen = False
-                            game_running = True
-
-        elif game_running: # Carry on here ---------> pygame.event.Event' object has no attribute 'key'
+            easy_rect = pygame.draw.rect(screen, (255, 255, 255), (WIDTH // 4, HEIGHT // 2 - 30, WIDTH // 2, 60))
+            hard_rect = pygame.draw.rect(screen, (255, 255, 255), (WIDTH // 4, HEIGHT // 2 + 40, WIDTH // 2, 60))
+            advanced_rect = pygame.draw.rect(screen, (255, 255, 255), (WIDTH // 4, HEIGHT // 2 + 110, WIDTH // 2, 60))
+            draw_text("Easy", font_medium, (0, 0, 0), easy_rect.centerx, easy_rect.centery, screen)
+            draw_text("Hard", font_medium, (0, 0, 0), hard_rect.centerx, hard_rect.centery, screen)
+            draw_text("Advanced", font_medium, (0, 0, 0), advanced_rect.centerx, advanced_rect.centery, screen)
+        elif game_running:
             screen.fill(BACKGROUND_COLOR)
             all_sprites.update()
             all_sprites.draw(screen)
             generate_pipes(screen)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                elif event.type == pygame.KEYDOWN: 
-                    if event.key == pygame.K_UP:
-                        bird.rect.y -= 10  
-                    elif event.key == pygame.K_DOWN:
-                        bird.rect.y += 10  
-                    elif event.key == pygame.K_SPACE:
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
                         bird.jump()
-                    
-                    
-#               elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-#                  bird.jump()
 
-#            if pygame.sprite.spritecollideany(bird, pipes_group):
-#                game_running = False
-#                game_over = True
+            if pygame.sprite.spritecollideany(bird, pipes_group):
+                game_running = False
+                game_over = True
 
-        elif game_over and popup_active:
+            # Update the screen with the latest frame
+            pygame.display.update()
+        elif game_over:
             draw_game_over_screen(screen)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_x, mouse_y = pygame.mouse.get_pos()
-                    if WIDTH // 4 <= mouse_x <= WIDTH // 4 + WIDTH // 2 and HEIGHT * 3 // 4 - 50 <= mouse_y <= HEIGHT * 3 // 4:
-                        webbrowser.open_new("https://www.linkedin.com/feed/update/urn:li:activity:7205913460470136832/")
-                    elif WIDTH // 4 <= mouse_x <= WIDTH // 4 + WIDTH // 2 and HEIGHT * 3 // 4 + 10 <= mouse_y <= HEIGHT * 3 // 4 + 60:
-                        start_game()
-                    elif WIDTH // 4 <= mouse_x <= WIDTH // 4 + WIDTH // 2 and HEIGHT * 3 // 4 + 70 <= mouse_y <= HEIGHT * 3 // 4 + 120:
-                        pygame.quit()
-                        sys.exit()
-                    elif WIDTH // 4 <= mouse_x <= WIDTH // 4 + WIDTH // 2 and HEIGHT * 3 // 4 + 130 <= mouse_y <= HEIGHT * 3 // 4 + 180:
-                        webbrowser.open_new("https://www.service-public.fr/particuliers/vosdroits/F1943")
-                    else:
-                        popup_active = False
 
-        pygame.display.update()
+        pygame.display.flip()
         clock.tick(60)
 
-    pygame.quit()
-    
 if __name__ == "__main__":
     main()
+
+
+
+
+
+    #### Note my self
     
-    #### Note my self 
     ## restrain birds to a fixed sized                                       <<<<<<<<<<<< done
     ## Pipes logic isnt working -- to be fixed !                             <<<<<<<<<<<< done
-    ## Add button to be checked for warnings about usages and conditions
-    ## modify bird mov from mouse to keyup and keydown 
-    ## redefine pop up when the game is lost                                 <<<<<<<<<<<< start again from this point 
+    ## Create a video before after screen start                              <<<<<<<<<<<< done
+    ## modify bird mov from mouse to keyup and keydown                       <<<<<<<<<<<< done however replaced with space bar to fly 
+    ## redefine pop up when the game is lost                                 <<<<<<<<<<<< reverted to basics, it works but needs style 
     ## Birds shall be centered on start 4 x 4                                <<<<<<<<<<<< done
+    ## Birds are still randomnly chosen when game starts        
+                             
+    ## sounds when choosing the bird
+    ## sounds when game is lost
+    ## sounds when game is won
+    ## sounds during game
+    ## Add a score board and load the assests
     
-    #### code to be added 
-    ## sounds
     ## background modify
-    ## floor must be included 
-    
-    ## Generate sounds for flap 
-    ## Create sound when the game is lost 
-    ## Create background 
-    
+    ## floor must be included
+
+    ## Generate sounds for flap
+    ## Create sound when the game is lost
+    ## Create background
+
     ## Create a score board
     ## Create a pause button
-    ## Create a restart button
-    ## Create a stop button
-    ## Create a start button
+    ## Create a restart button                                               <<<<<<<<<<<< done
+    ## Create a stop button                                                  <<<<<<<<<<<< done
+    ## Create a start button                                                 <<<<<<<<<<<< done
     
-    
-    
+    ## Modify pdf by about me 
+    ## 
