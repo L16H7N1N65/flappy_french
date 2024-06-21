@@ -116,7 +116,7 @@ def draw_game_over_screen(screen):
     draw_text("Game Over", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)
     draw_text(f"Your Score: {score}", font_medium, (0, 0, 0), WIDTH // 2, HEIGHT // 2, screen)
     pygame.draw.rect(screen, (255, 0, 0), (WIDTH // 4, HEIGHT * 3 // 4 - 50, WIDTH // 2, 50))
-    draw_text("Download PDF", font_medium, (255, 255, 255), WIDTH // 2, HEIGHT * 3 // 4 - 25, screen)
+    draw_text("About me", font_medium, (255, 255, 255), WIDTH // 2, HEIGHT * 3 // 4 - 25, screen)
     pygame.draw.rect(screen, (255, 0, 0), (WIDTH // 4, HEIGHT * 3 // 4 + 10, WIDTH // 2, 50))
     draw_text("Play Again", font_medium, (255, 255, 255), WIDTH // 2, HEIGHT * 3 // 4 + 35, screen)
     pygame.draw.rect(screen, (255, 0, 0), (WIDTH // 4, HEIGHT * 3 // 4 + 70, WIDTH // 2, 50))
@@ -255,7 +255,7 @@ def main():
                     x, y = event.pos
                     if WIDTH // 4 <= x <= WIDTH // 4 + WIDTH // 2:
                         if HEIGHT * 3 // 4 - 50 <= y <= HEIGHT * 3 // 4:
-                            # Download PDF logic here
+                            # Either pdf download or something else 
                             webbrowser.open('path_to_pdf')
                         elif HEIGHT * 3 // 4 + 10 <= y <= HEIGHT * 3 // 4 + 60:
                             # Restart game
