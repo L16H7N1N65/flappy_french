@@ -22,6 +22,7 @@ BIRD_IMAGES = [
     '../assets/birds/bird8.png'
 ]
 BIRD_SIZE = (74, 94)
+BACKGROUND_IMAGE_PATH = '../assets/background.png'
 
 DIFFICULTIES = {
     'easy': {'gap': 260, 'pipe_speed': 2},
@@ -38,7 +39,6 @@ pipes = []
 score = 0
 game_over = False
 popup_active = False
-conditions_accepted = False
 
 # Blinking related variables
 blink = False
@@ -108,7 +108,6 @@ def draw_bird_selection_screen(screen, bird_images):
     start_img_rect = start_img.get_rect(center=(WIDTH // 2, HEIGHT - 100))
     screen.blit(start_img, start_img_rect)
     
-##basic coding works atm 
 def draw_game_over_screen(screen):
     global popup_active
     popup_active = True
@@ -172,6 +171,12 @@ def main():
     selected_bird_index = 0  # default bird
     bird = Bird(bird_images, (100, HEIGHT // 2))
 
+    # Load and scale the background image
+    background_image = pygame.image.load(BACKGROUND_IMAGE_PATH).convert()
+    background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
+    
+    background_x = 0  # Keeping track of the starting
+
     start_screen = True
     bird_selection_screen = False
     difficulty_screen = False
@@ -195,7 +200,6 @@ def main():
                     elif event.key == pygame.K_RETURN:
                         bird_selection_screen = False
                         difficulty_screen = True
-                        select_bird(selected_bird_index)
                 elif difficulty_screen:
                     if event.key == pygame.K_UP:
                         set_difficulty('easy')
@@ -255,10 +259,8 @@ def main():
                     x, y = event.pos
                     if WIDTH // 4 <= x <= WIDTH // 4 + WIDTH // 2:
                         if HEIGHT * 3 // 4 - 50 <= y <= HEIGHT * 3 // 4:
-                            # Either pdf download or something else 
                             webbrowser.open('path_to_pdf')
                         elif HEIGHT * 3 // 4 + 10 <= y <= HEIGHT * 3 // 4 + 60:
-                            # Restart game
                             start_game()
                             game_running = True
                             popup_active = False
@@ -266,7 +268,6 @@ def main():
                             pygame.quit()
                             sys.exit()
                         elif HEIGHT * 3 // 4 + 130 <= y <= HEIGHT * 3 // 4 + 180:
-                            # Open website
                             webbrowser.open('https://example.com')
 
         if start_screen:
@@ -287,24 +288,22 @@ def main():
             draw_text("Hard", font_medium, (0, 0, 0), hard_rect.centerx, hard_rect.centery, screen)
             draw_text("Advanced", font_medium, (0, 0, 0), advanced_rect.centerx, advanced_rect.centery, screen)
         elif game_running:
-            screen.fill(BACKGROUND_COLOR)
+            # Scroll the background image
+            background_x -= 2 
+            if background_x <= -WIDTH:
+                background_x = 0
+
+            screen.blit(background_image, (background_x, 0))
+            screen.blit(background_image, (background_x + WIDTH, 0))
+
             all_sprites.update()
             all_sprites.draw(screen)
             generate_pipes(screen)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        bird.jump()
 
             if pygame.sprite.spritecollideany(bird, pipes_group):
                 game_running = False
                 game_over = True
 
-            # Update the screen with the latest frame
             pygame.display.update()
         elif game_over:
             draw_game_over_screen(screen)
@@ -315,38 +314,36 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-
-
-
-    #### Note my self
+"""
+#### Note my self
     
-    ## restrain birds to a fixed sized                                       <<<<<<<<<<<< done
-    ## Pipes logic isnt working -- to be fixed !                             <<<<<<<<<<<< done
-    ## Create a video before after screen start                              <<<<<<<<<<<< done
-    ## modify bird mov from mouse to keyup and keydown                       <<<<<<<<<<<< done however replaced with space bar to fly 
-    ## redefine pop up when the game is lost                                 <<<<<<<<<<<< reverted to basics, it works but needs style 
-    ## Birds shall be centered on start 4 x 4                                <<<<<<<<<<<< done
-    ## Birds are still randomnly chosen when game starts        
+## restrain birds to a fixed sized                                       <<<<<<<<<<<< done
+## Pipes logic isnt working -- to be fixed !                             <<<<<<<<<<<< done
+## Create a video before after screen start                              <<<<<<<<<<<< done
+## modify bird mov from mouse to keyup and keydown                       <<<<<<<<<<<< done however replaced with space bar to fly 
+## redefine pop up when the game is lost                                 <<<<<<<<<<<< reverted to basics, it works but needs style 
+## Birds shall be centered on start 4 x 4                                <<<<<<<<<<<< done
+## Birds are still randomnly chosen when game starts        
                              
-    ## sounds when choosing the bird
-    ## sounds when game is lost
-    ## sounds when game is won
-    ## sounds during game
-    ## Add a score board and load the assests
+## sounds when choosing the bird                                          <<<<<<<<<<<< pending
+## sounds when game is lost                                               <<<<<<<<<<<< pending
+## sounds when game is won                                                <<<<<<<<<<<< pending
+## sounds during game                                                     <<<<<<<<<<<< pending
+## Add a score board and load the assests                                 <<<<<<<<<<<< pending
     
-    ## background modify
-    ## floor must be included
+## background modify                                                      <<<<<<<<<<<< pending
+## floor must be included                                                 <<<<<<<<<<<< pending
 
-    ## Generate sounds for flap
-    ## Create sound when the game is lost
-    ## Create background
+## Generate sounds for flap                                               <<<<<<<<<<<< pending
+## Create sound when the game is lost                                     <<<<<<<<<<<< pending
+## Create background                                                      <<<<<<<<<<<< pending
 
-    ## Create a score board
-    ## Create a pause button
-    ## Create a restart button                                               <<<<<<<<<<<< done
-    ## Create a stop button                                                  <<<<<<<<<<<< done
-    ## Create a start button                                                 <<<<<<<<<<<< done
+## Create a score board                                                   <<<<<<<<<<<< pending
+## Create a pause button                                                  <<<<<<<<<<<< pending
+## Create a restart button                                                <<<<<<<<<<<< done
+## Create a stop button                                                   <<<<<<<<<<<< done
+## Create a start button                                                  <<<<<<<<<<<< done
     
-    ## Modify pdf by about me 
-    ## 
+## Modify pdf by about me                                                 <<<<<<<<<<<< pending
+
+"""
