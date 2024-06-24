@@ -1,8 +1,6 @@
 import pygame
 import os
 
-import pygame
-
 class Bird(pygame.sprite.Sprite):
     def __init__(self, images, avatar_image, initial_position, select_sound, pass_pipe_sound, bird_type='bird1'):
         super().__init__()
@@ -47,6 +45,8 @@ class Bird(pygame.sprite.Sprite):
             if current_time - self.animation_frame_time >= self.animation_interval:
                 self.animate()
                 self.animation_frame_time = current_time
+        else:
+            self.image = pygame.transform.scale(self.images[0], (74, 94))
 
     def jump(self):
         self.velocity = self.jump_velocity
@@ -62,6 +62,7 @@ class Bird(pygame.sprite.Sprite):
 
     def play_pass_pipe_sound(self):
         self.pass_pipe_sound.play()
+
 
 
 

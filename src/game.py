@@ -24,6 +24,10 @@ ANIMATED_BIRDS = {
         '../assets/birds/bird1_flap.png',
         '../assets/birds/bird1_flop.png'
     ],
+    'bird2': [
+        '../assets/birds/bird3_flap.png',
+        '../assets/birds/bird3_flop.png'
+    ],
     'bird3': [
         '../assets/birds/bird3_flap.png',
         '../assets/birds/bird3_flop.png'
@@ -62,6 +66,12 @@ BIRD_PASS_PIPE_SOUNDS = [
     '../assets/sounds/pass_pipe8.wav'
 ]
 
+MARIO_SOUND = '../assets/sounds/mario.wav'
+MARIO_IMAGE_PATH = '../assets/birds/mario.png'
+BALL_IMAGE_PATH = '../assets/birds/ball.png'
+
+BACKGROUND_MUSIC_PATH = '../assets/sounds/background_music.mp3'
+
 DIFFICULTIES = {
     'easy': {'gap': 260, 'pipe_speed': 2},
     'hard': {'gap': 195, 'pipe_speed': 3},
@@ -79,6 +89,7 @@ pipes = []
 score = 0
 game_over = False
 popup_active = False
+current_select_sound = None
 
 # Blinking related variables
 blink = False
@@ -99,6 +110,8 @@ font_small = pygame.font.SysFont('Arial', 15)
 # Sprites
 all_sprites = pygame.sprite.Group()
 pipes_group = pygame.sprite.Group()
+mario_group = pygame.sprite.Group()
+balls_group = pygame.sprite.Group()
 
 def load_images(image_paths, size):
     images = []
@@ -146,9 +159,9 @@ def draw_start_screen(screen, blink):
 
 def draw_bird_selection_screen(screen, bird_images):
     screen.fill(BACKGROUND_COLOR)
-    draw_text("Select Your Bird", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)
+    draw_text("Qui sera ton candidat ?", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)
 
-    button_width, button_height = 120, 60
+    button_width, button_height = 120, 60 # Tommorrow adjust the size of the button
     for i in range(len(bird_images)):
         row = i // 4
         col = i % 4
@@ -167,6 +180,7 @@ def draw_bird_selection_screen(screen, bird_images):
 def draw_game_over_screen(screen):
     global popup_active
     popup_active = True
+    pygame.mixer.music.stop()  # Stop the music when the game is over
     screen.fill(BACKGROUND_COLOR)
     draw_text("Game Over", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)
     draw_text(f"Your Score: {score}", font_medium, (0, 0, 0), WIDTH // 2, HEIGHT // 2, screen)
@@ -180,18 +194,23 @@ def draw_game_over_screen(screen):
     draw_text("Visit Website", font_medium, (255, 255, 255), WIDTH // 2, HEIGHT * 3 // 4 + 155, screen)
 
 def start_game():
-    global game_over, pipes, score, popup_active
+    global game_over, pipes, score, popup_active, bird
     game_over = False
     popup_active = False
     pipes = []
     score = 0
-    bird.rect.y = HEIGHT // 2
     all_sprites.empty()
     pipes_group.empty()
     all_sprites.add(bird)
+    bird.rect.y = HEIGHT // 2
+    pygame.mixer.music.load(BACKGROUND_MUSIC_PATH)
+    pygame.mixer.music.set_volume(0.1) 
+    pygame.mixer.music.play(-1) # Play the background music in a loop
 
 def select_bird(index):
-    global selected_bird_index, bird_image, bird
+    global selected_bird_index, bird_image, bird, current_select_sound
+    if current_select_sound:
+        current_select_sound.stop()
     selected_bird_index = index
     bird_image = avatar_birds[selected_bird_index]
     bird_select_sound = bird_select_sounds[selected_bird_index]
@@ -199,10 +218,8 @@ def select_bird(index):
     bird_type = f'bird{selected_bird_index + 1}'
     animated_images = load_images(ANIMATED_BIRDS.get(bird_type, [bird_image]), BIRD_SIZE)
     bird = Bird(animated_images, bird_image, (100, HEIGHT // 2), bird_select_sound, bird_pass_pipe_sound, bird_type)
-    
-def play_select_sound():
-    bird_select_sound = bird_select_sounds[selected_bird_index]
-    bird_select_sound.play()
+    current_select_sound = bird_select_sound
+    current_select_sound.play()
 
 def set_difficulty(level):
     global difficulty
@@ -210,6 +227,7 @@ def set_difficulty(level):
     start_game()
 
 def generate_pipes(screen):
+    global mario_timer
     gap = DIFFICULTIES[difficulty]['gap']
     pipe_speed = DIFFICULTIES[difficulty]['pipe_speed']
     last_pipe = pipes[-1] if pipes else None
@@ -221,8 +239,15 @@ def generate_pipes(screen):
         pipes.extend([pipe_top, pipe_bottom])
         pipes_group.add(pipe_top, pipe_bottom)
 
+        if len(pipes) // 2 % 4 == 0:
+            mario = Mario(mario_group, all_sprites, WIDTH, pipe_bottom.rect.top + pipe_bottom.rect.height)
+            all_sprites.add(mario)
+            mario_group.add(mario)
+            mario_sound.play()
+
     pipes_group.update()
     pipes_group.draw(screen)
+
 
 def load_digit_images():
     digit_images = []
@@ -262,7 +287,7 @@ def check_score():
             bird.play_pass_pipe_sound()  # Play passing pipe sound
 
 def main():
-    global screen, avatar_birds, bird_select_sounds, bird_pass_pipe_sounds, clock, bird, selected_bird_index, difficulty, game_over, pipes, draw_score, popup_active, blink, last_blink_time, load_digit_images
+    global screen, avatar_birds, bird_select_sounds, bird_pass_pipe_sounds, clock, bird, selected_bird_index, difficulty, game_over, pipes, draw_score, popup_active, blink, last_blink_time, load_digit_images, mario_sound
 
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -270,8 +295,11 @@ def main():
     avatar_birds = load_images(AVATAR_BIRDS, (50, 50))
     bird_select_sounds = load_sounds(BIRD_SELECT_SOUNDS)
     bird_pass_pipe_sounds = load_sounds(BIRD_PASS_PIPE_SOUNDS)
+    mario_sound = pygame.mixer.Sound(MARIO_SOUND)
     selected_bird_index = 0  # default bird
-    select_bird(selected_bird_index)
+
+    # Ensure no sound plays at the start except background music
+    current_select_sound = None
 
     # Load and scale the background image
     background_image = pygame.image.load(BACKGROUND_IMAGE_PATH).convert()
@@ -297,11 +325,9 @@ def main():
                     if event.key == pygame.K_LEFT:
                         selected_bird_index = (selected_bird_index - 1) % len(avatar_birds)
                         select_bird(selected_bird_index)
-                        play_select_sound()
                     elif event.key == pygame.K_RIGHT:
                         selected_bird_index = (selected_bird_index + 1) % len(avatar_birds)
                         select_bird(selected_bird_index)
-                        play_select_sound()
                     elif event.key == pygame.K_RETURN:
                         bird_selection_screen = False
                         difficulty_screen = True
@@ -340,7 +366,6 @@ def main():
                         button_y = HEIGHT // 2 + row * (button_height + 10)
                         if button_x <= x <= button_x + button_width and button_y <= y <= button_y + button_height:
                             select_bird(i)
-                            play_select_sound()
                     start_img_rect = pygame.Rect((WIDTH // 2 - button_width // 2, HEIGHT - 100, button_width, button_height))
                     if start_img_rect.collidepoint(event.pos):
                         bird_selection_screen = False
@@ -408,7 +433,7 @@ def main():
             check_score()
             draw_score(screen, score, digit_images)
 
-            if pygame.sprite.spritecollideany(bird, pipes_group):
+            if pygame.sprite.spritecollideany(bird, pipes_group) or pygame.sprite.spritecollideany(bird, balls_group):
                 game_running = False
                 game_over = True
 
@@ -418,6 +443,94 @@ def main():
 
         pygame.display.flip()
         clock.tick(60)
+
+class Mario(pygame.sprite.Sprite):
+    def __init__(self, group, all_sprites, x, y):
+        super().__init__(group, all_sprites)
+        self.image = pygame.image.load(MARIO_IMAGE_PATH).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (94, 110))  # Adjust Mario's size
+        self.rect = self.image.get_rect(midbottom=(x, y))
+        self.initial_y = y
+        self.counter = 0
+        self.top = self.rect.y - 250  # value to control how far Mario moves up
+        self.y_change = -2
+        self.timer = 0
+        self.fireball_timer = 0
+        self.fireball_interval = 1000  # Time in milliseconds between fireballs
+        self.fireball_count = 0
+        self.fireball_limit = 5  # Number of fireballs Mario will launch
+        self.direction = -1
+
+    def update(self):
+        if self.timer <= 0:
+            if self.rect.y <= self.top:
+                self.y_change = 0
+                self.timer = 90  # Time Mario stays at the top before going down
+                self.fireball_timer = pygame.time.get_ticks()  # Start fireball timer
+            self.rect.y += self.y_change
+        else:
+            self.timer -= 1
+            current_time = pygame.time.get_ticks()
+            if self.fireball_count < self.fireball_limit and current_time - self.fireball_timer >= self.fireball_interval:
+                fireball = Fireball(self.rect.center, self.get_fireball_direction())
+                all_sprites.add(fireball)
+                balls_group.add(fireball)
+                self.fireball_timer = current_time
+                self.fireball_count += 1
+
+            if self.timer <= 0:
+                self.y_change = 2
+                if self.rect.y >= self.initial_y:
+                    self.kill()  # Remove Mario once he goes back into the pipe  << not working
+
+    def get_fireball_direction(self):
+        bird_center_x, bird_center_y = bird.rect.center
+        mario_center_x, mario_center_y = self.rect.center
+        direction_x = bird_center_x - mario_center_x
+        direction_y = bird_center_y - mario_center_y
+        magnitude = (direction_x**2 + direction_y**2)**0.5
+        return direction_x / magnitude, direction_y / magnitude
+
+class Fireball(pygame.sprite.Sprite):
+    def __init__(self, initial_position, direction):
+        super().__init__()
+        self.image = pygame.image.load(BALL_IMAGE_PATH).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (70, 70))  # Adjust Fireball size
+        self.rect = self.image.get_rect(center=initial_position)
+        self.speed = 5
+        self.direction = direction
+
+    def update(self):
+        self.rect.x += self.speed * self.direction[0]
+        self.rect.y += self.speed * self.direction[1]
+        if self.rect.right < 0 or self.rect.left > WIDTH or self.rect.top < 0 or self.rect.bottom > HEIGHT:
+            self.kill()
+        if self.rect.colliderect(bird.rect):  # Check collision with bird
+            pygame.event.post(pygame.event.Event(pygame.USEREVENT, {}))  # Post game over event
+            self.kill()
+
+def generate_pipes(screen):
+    global mario_timer
+    gap = DIFFICULTIES[difficulty]['gap']
+    pipe_speed = DIFFICULTIES[difficulty]['pipe_speed']
+    last_pipe = pipes[-1] if pipes else None
+
+    if not pipes or (last_pipe and last_pipe.rect.right < WIDTH - 300):
+        pipe_height = random.randint(100, 300)
+        pipe_top = Pipe(PIPE_IMAGE_PATH, (WIDTH, pipe_height - 400), size=(80, 400), rotate=True)
+        pipe_bottom = Pipe(PIPE_IMAGE_PATH, (WIDTH, pipe_height + gap), size=(80, 400))
+        pipes.extend([pipe_top, pipe_bottom])
+        pipes_group.add(pipe_top, pipe_bottom)
+
+        if len(pipes) // 2 % 4 == 0:
+            mario = Mario(mario_group, all_sprites, pipe_bottom.rect.centerx, pipe_bottom.rect.bottom)
+            all_sprites.add(mario)
+            mario_group.add(mario)
+            mario_sound.set_volume(1.0)
+            mario_sound.play()
+
+    pipes_group.update()
+    pipes_group.draw(screen)
 
 if __name__ == "__main__":
     main()
