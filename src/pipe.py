@@ -12,25 +12,33 @@ class Pipe(pygame.sprite.Sprite):
     speed (int): Horizontal speed at which the pipe moves.
     
     Methods:
-    __init__(self, image, initial_position):
-        Initializes a new instance of Pipe with initial attributes.
+    __init__(self, image_path, initial_position, size=None, rotate=False):
+        Initializes a new instance of Pipe with an image loaded from a PNG file.
     
     update(self):
         Updates the state of the pipe sprite each frame, moving it horizontally and handling removal when off-screen.
     """
 
-    def __init__(self, image, initial_position):
+    def __init__(self, image_path, initial_position, size=None, rotate=False):
         """
-        Initializes a new instance of Pipe.
+        Initializes a new instance of Pipe with an image loaded from a PNG file.
 
         Args:
-        image (Surface): Image of the pipe sprite.
+        image_path (str): Path to the PNG image file for the pipe sprite.
         initial_position (tuple): Initial position (x, y) of the pipe sprite's top-left corner on the screen.
+        size (tuple, optional): Desired size (width, height) of the pipe sprite. If provided, the image will be scaled to this size.
+        rotate (bool, optional): Whether to rotate the image by 180 degrees. Default is False.
         """
         super().__init__()  # Initialize the parent class (pygame.sprite.Sprite)
-        self.image = image  # Set the image of the pipe sprite
+        image = pygame.image.load(image_path)  # Load the image from the specified path
+        if size is not None:
+            image = pygame.transform.scale(image, size)  # Scale the image if a size is specified
+        if rotate:
+            image = pygame.transform.rotate(image, 180)  # Rotate the image by 180 degrees if specified
+        self.image = image  # Set the loaded image as the pipe sprite's image
         self.rect = self.image.get_rect(topleft=initial_position)  # Create a Rect based on the initial position
         self.speed = 2  # Horizontal speed at which the pipe moves
+        self.scored = False  # Track if the pipe has been scored
 
     def update(self):
         """
@@ -43,6 +51,7 @@ class Pipe(pygame.sprite.Sprite):
         # Check if the right edge of the pipe sprite has moved completely off the left side of the screen
         if self.rect.right < 0:
             self.kill()  # Remove the pipe sprite from all sprite groups it belongs to
+
 
     """
     Note to myself:

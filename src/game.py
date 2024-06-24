@@ -1,5 +1,3 @@
-##game.py
-
 import pygame
 import random
 import sys
@@ -11,7 +9,7 @@ from pipe import Pipe
 WIDTH, HEIGHT = 800, 600
 BACKGROUND_COLOR = (112, 197, 206)
 PIPE_COLOR = (46, 213, 115)
-BIRD_IMAGES = [
+AVATAR_BIRDS = [
     '../assets/birds/bird1.png',
     '../assets/birds/bird2.png',
     '../assets/birds/bird3.png',
@@ -21,8 +19,48 @@ BIRD_IMAGES = [
     '../assets/birds/bird7.png',
     '../assets/birds/bird8.png'
 ]
-BIRD_SIZE = (74, 94)
+ANIMATED_BIRDS = {
+    'bird1': [
+        '../assets/birds/bird1_flap.png',
+        '../assets/birds/bird1_flop.png'
+    ],
+    'bird3': [
+        '../assets/birds/bird3_flap.png',
+        '../assets/birds/bird3_flop.png'
+    ],
+    'bird4': [
+        '../assets/birds/bird4_flap.png',
+        '../assets/birds/bird4_flop.png'
+    ],
+}
+
+AVATAR_SIZE = (45, 60)  # Adjusted avatar size
+BIRD_SIZE = (77, 107)  # One-fourth of the original size
 BACKGROUND_IMAGE_PATH = '../assets/background.png'
+PIPE_IMAGE_PATH = '../assets/pipes/pipe.png'
+DIGIT_IMAGES_PATH = '../assets/digits'
+
+BIRD_SELECT_SOUNDS = [
+    '../assets/sounds/select1.wav',
+    '../assets/sounds/select2.wav',
+    '../assets/sounds/select3.wav',
+    '../assets/sounds/select4.wav',
+    '../assets/sounds/select5.wav',
+    '../assets/sounds/select6.wav',
+    '../assets/sounds/select7.wav',
+    '../assets/sounds/select8.wav'
+]
+
+BIRD_PASS_PIPE_SOUNDS = [
+    '../assets/sounds/pass_pipe1.wav',
+    '../assets/sounds/pass_pipe2.wav',
+    '../assets/sounds/pass_pipe3.wav',
+    '../assets/sounds/pass_pipe4.wav',
+    '../assets/sounds/pass_pipe5.wav',
+    '../assets/sounds/pass_pipe6.wav',
+    '../assets/sounds/pass_pipe7.wav',
+    '../assets/sounds/pass_pipe8.wav'
+]
 
 DIFFICULTIES = {
     'easy': {'gap': 260, 'pipe_speed': 2},
@@ -31,7 +69,9 @@ DIFFICULTIES = {
 }
 
 # Global variables
-bird_images = []
+avatar_birds = []
+bird_select_sounds = []
+bird_pass_pipe_sounds = []
 bird_image = None
 selected_bird_index = 0
 difficulty = ''
@@ -46,7 +86,12 @@ last_blink_time = 0
 blink_speed = 500
 
 # Initialize Pygame
+pygame.init()
 pygame.font.init()
+pygame.mixer.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+clock = pygame.time.Clock()
+
 font_large = pygame.font.SysFont('Arial', 50)
 font_medium = pygame.font.SysFont('Arial', 30)
 font_small = pygame.font.SysFont('Arial', 15)
@@ -55,17 +100,28 @@ font_small = pygame.font.SysFont('Arial', 15)
 all_sprites = pygame.sprite.Group()
 pipes_group = pygame.sprite.Group()
 
-def load_images(image_paths):
+def load_images(image_paths, size):
     images = []
     for path in image_paths:
         try:
             image = pygame.image.load(path).convert_alpha()
-            image = pygame.transform.scale(image, BIRD_SIZE)
+            image = pygame.transform.scale(image, size)
             images.append(image)
         except pygame.error as e:
             print(f"Failed to load image at {path}: {e}")
             sys.exit(1)
     return images
+
+def load_sounds(sound_paths):
+    sounds = []
+    for path in sound_paths:
+        try:
+            sound = pygame.mixer.Sound(path)
+            sounds.append(sound)
+        except pygame.error as e:
+            print(f"Failed to load sound at {path}: {e}")
+            sys.exit(1)
+    return sounds
 
 def draw_text(text, font, color, x, y, screen):
     text_surface = font.render(text, True, color)
@@ -99,7 +155,7 @@ def draw_bird_selection_screen(screen, bird_images):
         button_x = (WIDTH // 2 - (button_width * 4 + 30) // 2) + col * (button_width + 10)
         button_y = HEIGHT // 2 + row * (button_height + 10)
         pygame.draw.rect(screen, (255, 255, 255), (button_x, button_y, button_width, button_height))
-        screen.blit(pygame.transform.scale(bird_images[i], (button_width, button_height)), (button_x, button_y))
+        screen.blit(bird_images[i], (button_x + 35, button_y + 5))
         if selected_bird_index == i:
             pygame.draw.rect(screen, (255, 0, 0), (button_x, button_y, button_width, button_height), 3)
 
@@ -107,7 +163,7 @@ def draw_bird_selection_screen(screen, bird_images):
     start_img = pygame.transform.scale(start_img, (button_width, button_height))
     start_img_rect = start_img.get_rect(center=(WIDTH // 2, HEIGHT - 100))
     screen.blit(start_img, start_img_rect)
-    
+
 def draw_game_over_screen(screen):
     global popup_active
     popup_active = True
@@ -137,9 +193,16 @@ def start_game():
 def select_bird(index):
     global selected_bird_index, bird_image, bird
     selected_bird_index = index
-    bird_image = bird_images[selected_bird_index]
-    bird = Bird(bird_images, (100, HEIGHT // 2))
-    start_game()  # Reset game when bird is selected
+    bird_image = avatar_birds[selected_bird_index]
+    bird_select_sound = bird_select_sounds[selected_bird_index]
+    bird_pass_pipe_sound = bird_pass_pipe_sounds[selected_bird_index]
+    bird_type = f'bird{selected_bird_index + 1}'
+    animated_images = load_images(ANIMATED_BIRDS.get(bird_type, [bird_image]), BIRD_SIZE)
+    bird = Bird(animated_images, bird_image, (100, HEIGHT // 2), bird_select_sound, bird_pass_pipe_sound, bird_type)
+    
+def play_select_sound():
+    bird_select_sound = bird_select_sounds[selected_bird_index]
+    bird_select_sound.play()
 
 def set_difficulty(level):
     global difficulty
@@ -153,28 +216,66 @@ def generate_pipes(screen):
 
     if not pipes or (last_pipe and last_pipe.rect.right < WIDTH - 300):
         pipe_height = random.randint(100, 300)
-        pipe_top = Pipe(pygame.Surface((80, pipe_height)), (WIDTH, 0))
-        pipe_bottom = Pipe(pygame.Surface((80, HEIGHT - pipe_height - gap)), (WIDTH, pipe_height + gap))
+        pipe_top = Pipe(PIPE_IMAGE_PATH, (WIDTH, pipe_height - 400), size=(80, 400), rotate=True)
+        pipe_bottom = Pipe(PIPE_IMAGE_PATH, (WIDTH, pipe_height + gap), size=(80, 400))
         pipes.extend([pipe_top, pipe_bottom])
         pipes_group.add(pipe_top, pipe_bottom)
 
     pipes_group.update()
     pipes_group.draw(screen)
 
+def load_digit_images():
+    digit_images = []
+    for i in range(10):
+        path = f"{DIGIT_IMAGES_PATH}/{i}.png"
+        try:
+            image = pygame.image.load(path).convert_alpha()
+            digit_images.append(image)
+        except pygame.error as e:
+            print(f"Failed to load digit image at {path}: {e}")
+            sys.exit(1)
+    return digit_images
+
+digit_images = load_digit_images()
+
+def draw_score(screen, score, digit_images):
+    score_str = str(score)
+    digit_height = digit_images[0].get_height() * 2  # Scale factor
+    digit_width = digit_images[0].get_width() * 2
+    total_width = sum(digit_width for digit in score_str)
+    x_offset = (WIDTH - total_width) // 2
+
+    for digit in score_str:
+        digit_image = pygame.transform.scale(digit_images[int(digit)], (digit_width, digit_height))
+        screen.blit(digit_image, (x_offset, 20))
+        x_offset += digit_width
+
+def check_score():
+    global score
+    # Ensuring we only count once per pipe pair
+    for i in range(0, len(pipes), 2):
+        pipe_top = pipes[i]
+        pipe_bottom = pipes[i + 1]
+        if not pipe_top.scored and pipe_top.rect.right < bird.rect.left:
+            pipe_top.scored = pipe_bottom.scored = True
+            score += 1
+            bird.play_pass_pipe_sound()  # Play passing pipe sound
+
 def main():
-    global screen, bird_images, clock, bird, selected_bird_index, difficulty, game_over, pipes, score, popup_active, blink, last_blink_time
+    global screen, avatar_birds, bird_select_sounds, bird_pass_pipe_sounds, clock, bird, selected_bird_index, difficulty, game_over, pipes, draw_score, popup_active, blink, last_blink_time, load_digit_images
 
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
-    bird_images = load_images(BIRD_IMAGES)
+    avatar_birds = load_images(AVATAR_BIRDS, (50, 50))
+    bird_select_sounds = load_sounds(BIRD_SELECT_SOUNDS)
+    bird_pass_pipe_sounds = load_sounds(BIRD_PASS_PIPE_SOUNDS)
     selected_bird_index = 0  # default bird
-    bird = Bird(bird_images, (100, HEIGHT // 2))
+    select_bird(selected_bird_index)
 
     # Load and scale the background image
     background_image = pygame.image.load(BACKGROUND_IMAGE_PATH).convert()
     background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
-    
     background_x = 0  # Keeping track of the starting
 
     start_screen = True
@@ -194,9 +295,13 @@ def main():
                     bird_selection_screen = True
                 elif bird_selection_screen:
                     if event.key == pygame.K_LEFT:
-                        selected_bird_index = (selected_bird_index - 1) % len(bird_images)
+                        selected_bird_index = (selected_bird_index - 1) % len(avatar_birds)
+                        select_bird(selected_bird_index)
+                        play_select_sound()
                     elif event.key == pygame.K_RIGHT:
-                        selected_bird_index = (selected_bird_index + 1) % len(bird_images)
+                        selected_bird_index = (selected_bird_index + 1) % len(avatar_birds)
+                        select_bird(selected_bird_index)
+                        play_select_sound()
                     elif event.key == pygame.K_RETURN:
                         bird_selection_screen = False
                         difficulty_screen = True
@@ -228,13 +333,14 @@ def main():
                 elif bird_selection_screen:
                     x, y = event.pos
                     button_width, button_height = 120, 60
-                    for i in range(len(bird_images)):
+                    for i in range(len(avatar_birds)):
                         row = i // 4
                         col = i % 4
                         button_x = (WIDTH // 2 - (button_width * 4 + 30) // 2) + col * (button_width + 10)
                         button_y = HEIGHT // 2 + row * (button_height + 10)
                         if button_x <= x <= button_x + button_width and button_y <= y <= button_y + button_height:
                             select_bird(i)
+                            play_select_sound()
                     start_img_rect = pygame.Rect((WIDTH // 2 - button_width // 2, HEIGHT - 100, button_width, button_height))
                     if start_img_rect.collidepoint(event.pos):
                         bird_selection_screen = False
@@ -277,7 +383,7 @@ def main():
                 last_blink_time = current_time
             draw_start_screen(screen, blink)
         elif bird_selection_screen:
-            draw_bird_selection_screen(screen, bird_images)
+            draw_bird_selection_screen(screen, avatar_birds)
         elif difficulty_screen:
             screen.fill(BACKGROUND_COLOR)
             draw_text("Select Difficulty", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)
@@ -290,15 +396,17 @@ def main():
         elif game_running:
             # Scroll the background image
             background_x -= 2 
-            if background_x <= -WIDTH:
+            if background_x <= -background_image.get_width():
                 background_x = 0
 
             screen.blit(background_image, (background_x, 0))
-            screen.blit(background_image, (background_x + WIDTH, 0))
+            screen.blit(background_image, (background_x + background_image.get_width(), 0))
 
             all_sprites.update()
             all_sprites.draw(screen)
             generate_pipes(screen)
+            check_score()
+            draw_score(screen, score, digit_images)
 
             if pygame.sprite.spritecollideany(bird, pipes_group):
                 game_running = False
@@ -313,6 +421,12 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
 
 """
 #### Note my self
