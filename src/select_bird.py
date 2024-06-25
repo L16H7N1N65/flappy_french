@@ -1,5 +1,5 @@
 import pygame
-from global_vars import AVATAR_BIRDS, BIRD_SIZE, BIRD_SELECT_SOUNDS, BIRD_PASS_PIPE_SOUNDS, ANIMATED_BIRDS, HEIGHT, bird
+from global_vars import AVATAR_BIRDS, BIRD_SIZE, BIRD_SELECT_SOUNDS, BIRD_PASS_PIPE_SOUNDS, ANIMATED_BIRDS
 from load_images import load_images
 from bird import Bird
 
@@ -17,9 +17,3 @@ def select_bird(index):
     bird = Bird(animated_images, bird_image, (100, HEIGHT // 2), bird_select_sound, bird_pass_pipe_sound, bird_type)
     current_select_sound = bird_select_sound
     current_select_sound.play()
-
-
-
-
-
-
