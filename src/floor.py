@@ -1,14 +1,19 @@
+# floor.py
 import pygame
-from global_vars import WIDTH, HEIGHT
 
-class Floor(pygame.sprite.Sprite):
-    def __init__(self, image_path, width, height):
-        super().__init__()
+class Floor:
+    def __init__(self, image_path, screen_width, screen_height):
         self.image = pygame.image.load(image_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (width, height))
-        self.rect = self.image.get_rect(bottomleft=(0, HEIGHT))
+        self.height = self.image.get_height() // 3
+        self.image = pygame.transform.scale(self.image, (screen_width, self.height))
+        self.x = 0
+        self.y = screen_height - self.height
 
-    def update(self, speed):
-        self.rect.x -= speed
-        if self.rect.right < WIDTH:
-            self.rect.left = 0
+    def draw(self, screen):
+        screen.blit(self.image, (self.x, self.y))
+        screen.blit(self.image, (self.x + self.image.get_width(), self.y))
+
+    def update(self):
+        self.x -= 2
+        if self.x <= -self.image.get_width():
+            self.x = 0

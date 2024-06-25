@@ -1,9 +1,11 @@
+# global_vars.py
+
 import pygame
 
-# Constants
 WIDTH, HEIGHT = 800, 600
 BACKGROUND_COLOR = (112, 197, 206)
 PIPE_COLOR = (46, 213, 115)
+
 AVATAR_BIRDS = [
     '../assets/birds/bird1.png',
     '../assets/birds/bird2.png',
@@ -14,6 +16,7 @@ AVATAR_BIRDS = [
     '../assets/birds/bird7.png',
     '../assets/birds/bird8.png'
 ]
+
 ANIMATED_BIRDS = {
     'bird1': [
         '../assets/birds/bird1_flap.png',
@@ -32,12 +35,6 @@ ANIMATED_BIRDS = {
         '../assets/birds/bird4_flop.png'
     ],
 }
-AVATAR_SIZE = (45, 60)
-BIRD_SIZE = (77, 107)
-BACKGROUND_IMAGE_PATH = '../assets/background.png'
-PIPE_IMAGE_PATH = '../assets/pipes/pipe.png'
-DIGIT_IMAGES_PATH = '../assets/digits'
-FLOOR_IMAGE_PATH = '../assets/floor.png'
 
 BIRD_SELECT_SOUNDS = [
     '../assets/sounds/select1.wav',
@@ -62,10 +59,16 @@ BIRD_PASS_PIPE_SOUNDS = [
 ]
 
 MARIO_SOUND = '../assets/sounds/mario.wav'
-MARIO_IMAGE_PATH = '../assets/birds/mario.png'
+THEGODFATHER_IMAGE_PATH = '../assets/birds/mario.png'
 BALL_IMAGE_PATH = '../assets/birds/ball.png'
-
 BACKGROUND_MUSIC_PATH = '../assets/sounds/background_music.mp3'
+BACKGROUND_IMAGE_PATH = '../assets/background.png'
+PIPE_IMAGE_PATH = '../assets/pipes/pipe.png'
+DIGIT_IMAGES_PATH = '../assets/digits'
+FLOOR_IMAGE_PATH = '../assets/floor.png'
+
+AVATAR_SIZE = (45, 60)
+BIRD_SIZE = (77, 107)
 
 DIFFICULTIES = {
     'easy': {'gap': 260, 'pipe_speed': 2},
@@ -73,7 +76,7 @@ DIFFICULTIES = {
     'advanced': {'gap': 130, 'pipe_speed': 4}
 }
 
-# Game states
+# Global variables initialization
 avatar_birds = []
 bird_select_sounds = []
 bird_pass_pipe_sounds = []
@@ -106,5 +109,11 @@ font_small = pygame.font.SysFont('Arial', 15)
 # Sprites
 all_sprites = pygame.sprite.Group()
 pipes_group = pygame.sprite.Group()
-mario_group = pygame.sprite.Group()
+thegodfather_group = pygame.sprite.Group()
 balls_group = pygame.sprite.Group()
+
+print("global_vars loaded successfully")
+
+
+
+

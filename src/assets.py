@@ -1,8 +1,28 @@
-from load_images import load_images, load_sounds
-from global_vars import AVATAR_BIRDS, BIRD_SELECT_SOUNDS, BIRD_PASS_PIPE_SOUNDS
+# assets.py
+import pygame
+import sys
 
-def load_assets():
-    avatar_birds = load_images(AVATAR_BIRDS, (50, 50))
-    bird_select_sounds = load_sounds(BIRD_SELECT_SOUNDS)
-    bird_pass_pipe_sounds = load_sounds(BIRD_PASS_PIPE_SOUNDS)
-    return avatar_birds, bird_select_sounds, bird_pass_pipe_sounds
+def load_images(image_paths, size):
+    images = []
+    for path in image_paths:
+        try:
+            image = pygame.image.load(path).convert_alpha()
+            image = pygame.transform.scale(image, size)
+            images.append(image)
+        except pygame.error as e:
+            print(f"Failed to load image at {path}: {e}")
+            sys.exit(1)
+    return images
+
+def load_sounds(sound_paths):
+    sounds = []
+    for path in sound_paths:
+        try:
+            sound = pygame.mixer.Sound(path)
+            sounds.append(sound)
+        except pygame.error as e:
+            print(f"Failed to load sound at {path}: {e}")
+            sys.exit(1)
+    return sounds
+
+print("assets loaded successfully")

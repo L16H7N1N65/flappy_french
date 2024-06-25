@@ -1,11 +1,11 @@
 import pygame
+from global_vars import THEGODFATHER_IMAGE_PATH, BALL_IMAGE_PATH, WIDTH, HEIGHT, bird, all_sprites, balls_group
 from fireball import Fireball
-from global_vars import WIDTH, HEIGHT, bird, all_sprites, balls_group
 
 class TheGodfather(pygame.sprite.Sprite):
     def __init__(self, group, all_sprites, x, y):
         super().__init__(group, all_sprites)
-        self.image = pygame.image.load("../assets/birds/mario.png").convert_alpha()
+        self.image = pygame.image.load(THEGODFATHER_IMAGE_PATH).convert_alpha()
         self.image = pygame.transform.scale(self.image, (94, 110))
         self.rect = self.image.get_rect(midbottom=(x, y))
         self.initial_y = y
@@ -43,8 +43,13 @@ class TheGodfather(pygame.sprite.Sprite):
 
     def get_fireball_direction(self):
         bird_center_x, bird_center_y = bird.rect.center
-        godfather_center_x, godfather_center_y = self.rect.center
-        direction_x = bird_center_x - godfather_center_x
-        direction_y = bird_center_y - godfather_center_y
+        mario_center_x, mario_center_y = self.rect.center
+        direction_x = bird_center_x - mario_center_x
+        direction_y = bird_center_y - mario_center_y
         magnitude = (direction_x**2 + direction_y**2)**0.5
         return direction_x / magnitude, direction_y / magnitude
+
+
+print("thegodfather loaded successfully")
+
+

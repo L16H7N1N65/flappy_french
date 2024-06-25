@@ -1,7 +1,7 @@
 import pygame
 from font import draw_text
 
-def draw_start_screen(screen, blink, WIDTH, HEIGHT):
+def draw_start_screen(screen, WIDTH, HEIGHT, blink):
     bg_initial = pygame.image.load("../assets/bg_initial.png")
     bg_initial_scaled = pygame.transform.scale(bg_initial, (WIDTH, HEIGHT))
     screen.blit(bg_initial_scaled, (0, 0))
@@ -17,4 +17,5 @@ def draw_start_screen(screen, blink, WIDTH, HEIGHT):
     if blink:
         screen.blit(initial_start, initial_start_rect)
 
-    draw_text("Press SPACE to start", "medium", (255, 255, 255), WIDTH // 2, HEIGHT - 50, screen)
+print("draw_start_screen loaded successfully")
+

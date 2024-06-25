@@ -1,10 +1,12 @@
+# fireball.py
+
 import pygame
-from global_vars import WIDTH, HEIGHT, bird
+from global_vars import BALL_IMAGE_PATH, WIDTH, HEIGHT, bird
 
 class Fireball(pygame.sprite.Sprite):
     def __init__(self, initial_position, direction):
         super().__init__()
-        self.image = pygame.image.load("../assets/birds/ball.png").convert_alpha()
+        self.image = pygame.image.load(BALL_IMAGE_PATH).convert_alpha()
         self.image = pygame.transform.scale(self.image, (70, 70))
         self.rect = self.image.get_rect(center=initial_position)
         self.speed = 5
