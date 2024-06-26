@@ -1,28 +1,26 @@
-## pipe.py
+# pipe.py
 
 import pygame
-from global_vars import PIPE_IMAGE_PATH
+from global_vars import pipes_group
 
 class Pipe(pygame.sprite.Sprite):
-    def __init__(self, image_path, position, size=(80, 400), rotate=False):
+    def __init__(self, image_path, initial_position, size=None, rotate=False):
         super().__init__()
-        self.image = pygame.image.load(image_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, size)
+        image = pygame.image.load(image_path)
+        if size is not None:
+            image = pygame.transform.scale(image, size)
         if rotate:
-            self.image = pygame.transform.rotate(self.image, 180)
-        self.rect = self.image.get_rect(topleft=position)
+            image = pygame.transform.rotate(image, 180)
+        self.image = image
+        self.rect = self.image.get_rect(topleft=initial_position)
+        self.speed = 2
         self.scored = False
 
     def update(self):
-        self.rect.x -= 2
+        self.rect.x -= self.speed
         if self.rect.right < 0:
             self.kill()
 
+print("pipe loaded successfully")
 
 
-    """
-    Note to myself:
-    
-    Replace generated pipes by png loaded in assets folder
-    
-    """

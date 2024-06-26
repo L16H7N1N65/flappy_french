@@ -1,5 +1,6 @@
 import pygame
-from global_vars import all_sprites, pipes_group, bird, BACKGROUND_MUSIC_PATH, HEIGHT
+
+from global_vars import *
 
 def start_game():
     global game_over, pipes, score, popup_active, bird

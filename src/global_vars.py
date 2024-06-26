@@ -1,6 +1,6 @@
 # global_vars.py
-
 import pygame
+pygame.init()
 
 WIDTH, HEIGHT = 800, 600
 BACKGROUND_COLOR = (112, 197, 206)
@@ -89,18 +89,12 @@ game_over = False
 popup_active = False
 current_select_sound = None
 bird = None
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 # Blinking related variables
 blink = False
 last_blink_time = 0
 blink_speed = 500
-
-# Initialize Pygame
-pygame.init()
-pygame.font.init()
-pygame.mixer.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-clock = pygame.time.Clock()
 
 font_large = pygame.font.SysFont('Arial', 50)
 font_medium = pygame.font.SysFont('Arial', 30)
@@ -113,6 +107,11 @@ thegodfather_group = pygame.sprite.Group()
 balls_group = pygame.sprite.Group()
 
 print("global_vars loaded successfully")
+
+
+
+
+
 
 
 

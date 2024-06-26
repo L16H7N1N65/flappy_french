@@ -1,5 +1,5 @@
 import pygame
-from global_vars import THEGODFATHER_IMAGE_PATH, BALL_IMAGE_PATH, WIDTH, HEIGHT, bird, all_sprites, balls_group
+from global_vars import *
 from fireball import Fireball
 
 class TheGodfather(pygame.sprite.Sprite):
