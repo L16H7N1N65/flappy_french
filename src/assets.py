@@ -32,12 +32,12 @@ def load_sounds(sound_paths):
     return sounds
 
 # Load avatar birds with AVATAR_SIZE
-avatar_birds = load_images(AVATAR_BIRDS, AVATAR_SIZE )
+#avatar_birds = load_images(AVATAR_BIRDS, AVATAR_SIZE )
 
 
 # Load bird select sounds
-bird_select_sounds = load_sounds(BIRD_SELECT_SOUNDS)
-bird_pass_pipe_sounds = load_sounds(BIRD_PASS_PIPE_SOUNDS)
+#bird_select_sounds = load_sounds(BIRD_SELECT_SOUNDS)
+#bird_pass_pipe_sounds = load_sounds(BIRD_PASS_PIPE_SOUNDS)
 
 print("assets loaded successfully")
 
