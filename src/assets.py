@@ -1,7 +1,7 @@
 # assets.py
 import pygame
 import sys
-from global_vars import *
+
 pygame.init()
 
 

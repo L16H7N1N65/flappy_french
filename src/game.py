@@ -2,7 +2,6 @@ import pygame
 import random
 import sys
 import webbrowser
-from bird import Bird
 from select_bird import select_bird
 from pipe import Pipe
 from assets import load_images, load_sounds
@@ -13,6 +12,7 @@ from game_over import draw_game_over_screen
 from font import draw_text
 from thegodfather import TheGodfather
 from start_game import start_game
+from bird import Bird
 
 def draw_bird_selection_screen(screen, avatar_birds):
     screen.fill(BACKGROUND_COLOR)
@@ -38,35 +38,8 @@ def draw_bird_selection_screen(screen, avatar_birds):
     start_img = pygame.transform.scale(start_img, (button_width, button_height))
     start_img_rect = start_img.get_rect(center=(WIDTH // 2, HEIGHT - 100))
     screen.blit(start_img, start_img_rect)
-def generate_pipes():
-    global pipes
-    gap = DIFFICULTIES[difficulty]['gap']
-    pipe_speed = DIFFICULTIES[difficulty]['pipe_speed']
-    last_pipe = pipes[-1] if pipes else None
+    return start_img_rect
 
-    if not pipes or (last_pipe and last_pipe.rect.right < WIDTH - 300):
-        pipe_height = random.randint(100, 300)
-        pipe_top = Pipe(PIPE_IMAGE_PATH, (WIDTH, pipe_height - 400), size=(80, 400), rotate=True)
-        pipe_bottom = Pipe(PIPE_IMAGE_PATH, (WIDTH, pipe_height + gap), size=(80, 400))
-        pipes.extend([pipe_top, pipe_bottom])
-        pipes_group.add(pipe_top, pipe_bottom)
-
-        if len(pipes) // 2 % 4 == 0:
-            thegodfather = TheGodfather(thegodfather_group, all_sprites, WIDTH, pipe_bottom.rect.top + pipe_bottom.rect.height)
-            all_sprites.add(thegodfather)
-            thegodfather_group.add(thegodfather)
-            mario_sound.play()
-
-    pipes_group.update()
-
-    for i in range(0, len(pipes), 2):
-        check_score(pipes[i], pipes[i + 1])
-
-def set_difficulty(difficulty_level):
-    global difficulty
-    difficulty = difficulty_level
-    start_game()    
-    
 def generate_pipes():
     global pipes
     gap = DIFFICULTIES[difficulty]['gap']
@@ -179,7 +152,7 @@ def main():
                     elif event.key == pygame.K_RIGHT:
                         selected_bird_index = (selected_bird_index + 1) % len(avatar_birds)
                         select_bird(selected_bird_index, bird_select_sounds, bird_pass_pipe_sounds, ANIMATED_BIRDS, AVATAR_BIRDS)
-                    elif event.key == pygame.MOUSEBUTTONDOWN:
+                    elif event.key == pygame.K_RETURN:
                         if bird is not None:
                             bird_selection_screen = False
                             difficulty_screen = True
@@ -187,15 +160,15 @@ def main():
                     if bird is None:
                         print("Error: Bird is not initialized!")
                         continue
-                    if event.key == pygame.MOUSEBUTTONDOWN:
+                    if event.key == pygame.K_UP:
                         set_difficulty('easy')
                         difficulty_screen = False
                         game_running = True
-                    elif event.key == pygame.MOUSEBUTTONDOWN:
+                    elif event.key == pygame.K_DOWN:
                         set_difficulty('advanced')
                         difficulty_screen = False
                         game_running = True
-                    elif event.key == pygame.MOUSEBUTTONDOWN:
+                    elif event.key == pygame.K_RIGHT:
                         set_difficulty('hard')
                         difficulty_screen = False
                         game_running = True
@@ -226,6 +199,8 @@ def main():
                         if bird is not None:
                             bird_selection_screen = False
                             difficulty_screen = True
+                        else:
+                            print("Start button clicked, but bird is not initialized.")
                 elif difficulty_screen:
                     x, y = event.pos
                     easy_rect = pygame.Rect(WIDTH // 4, HEIGHT // 2 - 30, WIDTH // 2, 60)
@@ -264,7 +239,7 @@ def main():
                 last_blink_time = current_time
             draw_start_screen(screen, blink)
         elif bird_selection_screen:
-            draw_bird_selection_screen(screen, avatar_birds)
+            start_img_rect = draw_bird_selection_screen(screen, avatar_birds)
         elif difficulty_screen:
             screen.fill(BACKGROUND_COLOR)
             draw_text("Select Difficulty", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)
@@ -300,6 +275,9 @@ def main():
         clock.tick(60)
 
 print("game loaded successfully")
+
+if __name__ == "__main__":
+    main()
 
 
 

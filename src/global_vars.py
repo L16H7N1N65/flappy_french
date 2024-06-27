@@ -1,4 +1,3 @@
-# global_vars.py
 import pygame
 pygame.init()
 
@@ -76,7 +75,7 @@ DIFFICULTIES = {
     'advanced': {'gap': 130, 'pipe_speed': 4}
 }
 
-# Global variables initialization
+# Global var initialization
 avatar_birds = []
 bird_select_sounds = []
 bird_pass_pipe_sounds = []
@@ -91,8 +90,7 @@ current_select_sound = None
 bird = None
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-# Blinking related variables
-blink = False
+# Blinking related var
 last_blink_time = 0
 blink_speed = 500
 
