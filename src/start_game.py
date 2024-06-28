@@ -1,6 +1,7 @@
 import pygame
 
 from global_vars import *
+from pipe import Pipe, generate_pipes, check_score, pipes_group, pipes, all_sprites, thegodfather_group
 
 def start_game():
     global game_over, pipes, score, popup_active, bird
@@ -21,5 +22,10 @@ def start_game():
     pygame.mixer.music.play(-1)
     print("Game started")  # Debug print
 
+def set_difficulty(difficulty_level):
+    global difficulty
+    difficulty = difficulty_level
+    start_game()
+    
 print("start_game loaded successfully")
 

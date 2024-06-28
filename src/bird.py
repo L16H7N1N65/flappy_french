@@ -60,4 +60,8 @@ class Bird(pygame.sprite.Sprite):
 
     def play_pass_pipe_sound(self):
         self.pass_pipe_sound.play()
+        
+'''
+defines the behavior and properties of a bird object in the game. It includes methods for the bird's movement, animation, and interactions with other game elements
+'''
 

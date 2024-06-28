@@ -1,9 +1,7 @@
-# assets.py
 import pygame
 import sys
 
 pygame.init()
-
 
 # Set the display mode
 screen = pygame.display.set_mode((800, 600))
@@ -31,15 +29,21 @@ def load_sounds(sound_paths):
             sys.exit(1)
     return sounds
 
-# Load avatar birds with AVATAR_SIZE
-#avatar_birds = load_images(AVATAR_BIRDS, AVATAR_SIZE )
-
-
-# Load bird select sounds
-#bird_select_sounds = load_sounds(BIRD_SELECT_SOUNDS)
-#bird_pass_pipe_sounds = load_sounds(BIRD_PASS_PIPE_SOUNDS)
+def load_digit_images(digit_images_path):
+    digit_images = []
+    for i in range(10):
+        path = f"{digit_images_path}/{i}.png"
+        try:
+            image = pygame.image.load(path).convert_alpha()
+            digit_images.append(image)
+        except pygame.error as e:
+            print(f"Failed to load digit image at {path}: {e}")
+            sys.exit(1)
+    return digit_images
 
 print("assets loaded successfully")
+
+
 
 '''
 assets.py:

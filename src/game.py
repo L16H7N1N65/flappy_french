@@ -1,87 +1,21 @@
 import pygame
-import random
 import sys
 import webbrowser
-from select_bird import select_bird
-from pipe import Pipe
-from assets import load_images, load_sounds
+from select_bird import select_bird, draw_bird_selection_screen
+from pipe import Pipe, generate_pipes, check_score
+from assets import load_images, load_sounds, load_digit_images
 from init import initialize
 from global_vars import *
 from draw_start_screen import draw_start_screen
 from game_over import draw_game_over_screen
 from font import draw_text
 from thegodfather import TheGodfather
-from start_game import start_game
+from start_game import start_game, set_difficulty
 from bird import Bird
 
-def draw_bird_selection_screen(screen, avatar_birds):
-    screen.fill(BACKGROUND_COLOR)
-    draw_text("Qui sera ton candidat ?", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)
 
-    button_width, button_height = 120, 60
-    for i in range(len(avatar_birds)):
-        row = i // 4
-        col = i % 4
-        button_x = (WIDTH // 2 - (button_width * 4 + 30) // 2) + col * (button_width + 10)
-        button_y = HEIGHT // 2 + row * (button_height + 10)
-        
-        # Draw the bird button
-        pygame.draw.rect(screen, (255, 255, 255), (button_x, button_y, button_width, button_height))
-        screen.blit(avatar_birds[i], (button_x + 35, button_y + 5))
-        
-        # Draw red rectangle if this is the selected bird
-        if selected_bird_index == i:
-            pygame.draw.rect(screen, (255, 0, 0), (button_x, button_y, button_width, button_height), 3)
 
-    # Draw the start button
-    start_img = pygame.image.load("../assets/start.png")
-    start_img = pygame.transform.scale(start_img, (button_width, button_height))
-    start_img_rect = start_img.get_rect(center=(WIDTH // 2, HEIGHT - 100))
-    screen.blit(start_img, start_img_rect)
-    return start_img_rect
-
-def generate_pipes():
-    global pipes
-    gap = DIFFICULTIES[difficulty]['gap']
-    pipe_speed = DIFFICULTIES[difficulty]['pipe_speed']
-    last_pipe = pipes[-1] if pipes else None
-
-    if not pipes or (last_pipe and last_pipe.rect.right < WIDTH - 300):
-        pipe_height = random.randint(100, 300)
-        pipe_top = Pipe(PIPE_IMAGE_PATH, (WIDTH, pipe_height - 400), size=(80, 400), rotate=True)
-        pipe_bottom = Pipe(PIPE_IMAGE_PATH, (WIDTH, pipe_height + gap), size=(80, 400))
-        pipes.extend([pipe_top, pipe_bottom])
-        pipes_group.add(pipe_top, pipe_bottom)
-
-        if len(pipes) // 2 % 4 == 0:
-            thegodfather = TheGodfather(thegodfather_group, all_sprites, WIDTH, pipe_bottom.rect.top + pipe_bottom.rect.height)
-            all_sprites.add(thegodfather)
-            thegodfather_group.add(thegodfather)
-            mario_sound.play()
-
-    pipes_group.update()
-
-    for i in range(0, len(pipes), 2):
-        check_score(pipes[i], pipes[i + 1])
-
-def set_difficulty(difficulty_level):
-    global difficulty
-    difficulty = difficulty_level
-    start_game()    
-    
-def load_digit_images():
-    digit_images = []
-    for i in range(10):
-        path = f"{DIGIT_IMAGES_PATH}/{i}.png"
-        try:
-            image = pygame.image.load(path).convert_alpha()
-            digit_images.append(image)
-        except pygame.error as e:
-            print(f"Failed to load digit image at {path}: {e}")
-            sys.exit(1)
-    return digit_images
-
-digit_images = load_digit_images()
+digit_images = load_digit_images(DIGIT_IMAGES_PATH)
 
 def draw_score(screen, score, digit_images):
     score_str = str(score)
@@ -95,16 +29,8 @@ def draw_score(screen, score, digit_images):
         screen.blit(digit_image, (x_offset, 20))
         x_offset += digit_width
 
-def check_score(pipe_top, pipe_bottom):
-    global score
-    if pipe_top is not None and pipe_bottom is not None:
-        if not pipe_top.scored and pipe_top.rect.right < bird.rect.left:
-            pipe_top.scored = pipe_bottom.scored = True
-            score += 1
-            bird.play_pass_pipe_sound()
-
 def main():
-    global screen, avatar_birds, bird_select_sounds, bird_pass_pipe_sounds, clock, bird, selected_bird_index, difficulty, game_over, pipes, draw_score, popup_active, blink, last_blink_time, load_digit_images, mario_sound, current_select_sound
+    global screen, avatar_birds, bird_select_sounds, Bird, bird_pass_pipe_sounds, clock, bird, selected_bird_index, difficulty, game_over, pipes, draw_score, popup_active, blink, last_blink_time, mario_sound, current_select_sound, Pipe, check_score, TheGodfather
     # Initialize pygame
     screen, clock = initialize()
     
@@ -146,32 +72,28 @@ def main():
                     start_screen = False
                     bird_selection_screen = True
                 elif bird_selection_screen:
+                    print(f"Error 78 :{bird}")
                     if event.key == pygame.K_LEFT:
                         selected_bird_index = (selected_bird_index - 1) % len(avatar_birds)
-                        select_bird(selected_bird_index, bird_select_sounds, bird_pass_pipe_sounds, ANIMATED_BIRDS, AVATAR_BIRDS)
+                        bird = select_bird(selected_bird_index, bird_select_sounds, bird_pass_pipe_sounds, ANIMATED_BIRDS, AVATAR_BIRDS)
+                        print(f"Error 82 :{bird}")
                     elif event.key == pygame.K_RIGHT:
                         selected_bird_index = (selected_bird_index + 1) % len(avatar_birds)
-                        select_bird(selected_bird_index, bird_select_sounds, bird_pass_pipe_sounds, ANIMATED_BIRDS, AVATAR_BIRDS)
+                        bird = select_bird(selected_bird_index, bird_select_sounds, bird_pass_pipe_sounds, ANIMATED_BIRDS, AVATAR_BIRDS)
                     elif event.key == pygame.K_RETURN:
                         if bird is not None:
                             bird_selection_screen = False
                             difficulty_screen = True
                 elif difficulty_screen:
-                    if bird is None:
-                        print("Error: Bird is not initialized!")
-                        continue
                     if event.key == pygame.K_UP:
-                        set_difficulty('easy')
-                        difficulty_screen = False
-                        game_running = True
+                        set_difficulty('easy')  
                     elif event.key == pygame.K_DOWN:
                         set_difficulty('advanced')
-                        difficulty_screen = False
-                        game_running = True
                     elif event.key == pygame.K_RIGHT:
                         set_difficulty('hard')
-                        difficulty_screen = False
-                        game_running = True
+                    difficulty_screen = False
+                    game_running = True
+                    print(f"Error 99 :{bird}")
                 elif game_running:
                     if event.key == pygame.K_SPACE:
                         bird.jump()
@@ -278,6 +200,9 @@ print("game loaded successfully")
 
 if __name__ == "__main__":
     main()
+
+
+
 
 
 

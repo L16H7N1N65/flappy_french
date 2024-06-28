@@ -2,9 +2,10 @@ import pygame
 from global_vars import *
 from assets import load_images, load_sounds
 from bird import Bird
+from font import draw_text
 
 def select_bird(index, bird_select_sounds, bird_pass_pipe_sounds, ANIMATED_BIRDS, AVATAR_BIRDS):
-    global selected_bird_index, bird_image, bird, current_select_sound
+    global selected_bird_index, bird_image, current_select_sound
     
     # Stop the current select sound if it is playing
     if current_select_sound:
@@ -44,9 +45,41 @@ def select_bird(index, bird_select_sounds, bird_pass_pipe_sounds, ANIMATED_BIRDS
     current_select_sound.play()
     print("Playing current select sound")
 
-    print(f"Bird selected: {bird_type}")
+    print(f"Bird selected: {bird}")
+
+    return bird
+
+def draw_bird_selection_screen(screen, avatar_birds):
+    screen.fill(BACKGROUND_COLOR)
+    draw_text("Qui sera ton candidat ?", font_large, (0, 0, 0), WIDTH // 2, HEIGHT // 4, screen)
+
+    button_width, button_height = 120, 60
+    for i in range(len(avatar_birds)):
+        row = i // 4
+        col = i % 4
+        button_x = (WIDTH // 2 - (button_width * 4 + 30) // 2) + col * (button_width + 10)
+        button_y = HEIGHT // 2 + row * (button_height + 10)
+        
+        # Draw the bird button
+        pygame.draw.rect(screen, (255, 255, 255), (button_x, button_y, button_width, button_height))
+        screen.blit(avatar_birds[i], (button_x + 35, button_y + 5))
+        
+        # Draw red rectangle if this is the selected bird
+        if selected_bird_index == i:
+            pygame.draw.rect(screen, (255, 0, 0), (button_x, button_y, button_width, button_height), 3)
+
+    # Draw the start button
+    start_img = pygame.image.load("../assets/start.png")
+    start_img = pygame.transform.scale(start_img, (button_width, button_height))
+    start_img_rect = start_img.get_rect(center=(WIDTH // 2, HEIGHT - 100))
+    screen.blit(start_img, start_img_rect)
+    return start_img_rect
 
 print("select_bird.py loaded successfully")
+
+'''
+fn responsible for selecting a bird from a list of available birds. It handles the logic for updating the selected bird, loading the corresponding images and sounds, and creating an instance of the Bird class with the selected attributes
+'''
 
 
 
