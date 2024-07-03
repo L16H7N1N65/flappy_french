@@ -1,4 +1,8 @@
+# bird.py
+
 import pygame
+from global_vars import config
+from assets import load_images, load_sounds
 
 class Bird(pygame.sprite.Sprite):
     def __init__(self, images, avatar_image, initial_position, select_sound, pass_pipe_sound, bird_type):
@@ -18,13 +22,11 @@ class Bird(pygame.sprite.Sprite):
         self.animation_frame_time = 0
         self.animation_interval = 200  # milliseconds
 
-        from global_vars import BIRD_SIZE  
-        from assets import load_images  
-        # Load animated images
         self.animated_images = {
-            'bird1': load_images(['../assets/birds/bird1_flap.png', '../assets/birds/bird1_flop.png'], BIRD_SIZE),
-            'bird3': load_images(['../assets/birds/bird3_flap.png', '../assets/birds/bird3_flop.png'], BIRD_SIZE),
-            'bird4': load_images(['../assets/birds/bird4_flap.png', '../assets/birds/bird4_flop.png'], BIRD_SIZE),
+            'bird1': load_images(config.ANIMATED_BIRDS['bird1'], config.BIRD_SIZE),
+            'bird2': load_images(config.ANIMATED_BIRDS['bird2'], config.BIRD_SIZE),
+            'bird3': load_images(config.ANIMATED_BIRDS['bird3'], config.BIRD_SIZE),
+            'bird4': load_images(config.ANIMATED_BIRDS['bird4'], config.BIRD_SIZE),
         }
 
     def update(self):
@@ -34,8 +36,8 @@ class Bird(pygame.sprite.Sprite):
         if self.rect.top <= 0:
             self.rect.top = 0
             self.velocity = 0
-        elif self.rect.bottom >= 600:
-            self.rect.bottom = 600
+        elif self.rect.bottom >= config.HEIGHT:
+            self.rect.bottom = config.HEIGHT
             self.velocity = 0
 
         if self.is_jumping:
@@ -60,6 +62,14 @@ class Bird(pygame.sprite.Sprite):
 
     def play_pass_pipe_sound(self):
         self.pass_pipe_sound.play()
+
+print("bird.py loaded successfully")
+
+
+
+
+
+
         
 '''
 defines the behavior and properties of a bird object in the game. It includes methods for the bird's movement, animation, and interactions with other game elements

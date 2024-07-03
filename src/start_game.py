@@ -1,32 +1,29 @@
-import pygame
+#start_game.py
 
-from global_vars import *
-from pipe import Pipe, generate_pipes, check_score, pipes_group, pipes, all_sprites, thegodfather_group
+import pygame
+from global_vars import config
 
 def start_game():
-    global game_over, pipes, score, popup_active, bird
+    global game_over, pipes, generate_pipes, score, popup_active, bird
     print("Starting game...")  # Debug print
-    if bird is None:
-        print("Error: Bird is not initialized!")  # Debug print
+    if config.bird is None:
+        print("Error 11: Bird is not initialized! start_game.py")  # Debug print
         return
-    game_over = False
-    popup_active = False
-    pipes = []
-    score = 0
-    all_sprites.empty()
-    pipes_group.empty()
-    all_sprites.add(bird)
-    bird.rect.y = HEIGHT // 2
-    pygame.mixer.music.load(BACKGROUND_MUSIC_PATH)
+    config.game_over = False
+    config.popup_active = False
+    config.pipes.clear()
+    config.score = 0
+    config.all_sprites.empty()
+    config.pipes_group.empty()
+    config.all_sprites.add(config.bird)
+    config.bird.rect.y = config.HEIGHT // 2
+    pygame.mixer.music.load(config.BACKGROUND_MUSIC_PATH)
     pygame.mixer.music.set_volume(0.15)
     pygame.mixer.music.play(-1)
     print("Game started")  # Debug print
 
-def set_difficulty(difficulty_level):
-    global difficulty
-    difficulty = difficulty_level
-    start_game()
-    
 print("start_game loaded successfully")
 
-## start coding from here 
+
+
+

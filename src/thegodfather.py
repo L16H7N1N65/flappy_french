@@ -1,11 +1,13 @@
+#thegodfather.py
+
 import pygame
-from global_vars import *
+from global_vars import config
 from fireball import Fireball
 
 class TheGodfather(pygame.sprite.Sprite):
     def __init__(self, group, all_sprites, x, y):
         super().__init__(group, all_sprites)
-        self.image = pygame.image.load(THEGODFATHER_IMAGE_PATH).convert_alpha()
+        self.image = pygame.image.load(config.THEGODFATHER_IMAGE_PATH).convert_alpha()
         self.image = pygame.transform.scale(self.image, (94, 110))
         self.rect = self.image.get_rect(midbottom=(x, y))
         self.initial_y = y
@@ -31,8 +33,8 @@ class TheGodfather(pygame.sprite.Sprite):
             current_time = pygame.time.get_ticks()
             if self.fireball_count < self.fireball_limit and current_time - self.fireball_timer >= self.fireball_interval:
                 fireball = Fireball(self.rect.center, self.get_fireball_direction())
-                all_sprites.add(fireball)
-                balls_group.add(fireball)
+                config.all_sprites.add(fireball)
+                config.balls_group.add(fireball)
                 self.fireball_timer = current_time
                 self.fireball_count += 1
 
@@ -42,13 +44,12 @@ class TheGodfather(pygame.sprite.Sprite):
                     self.kill()
 
     def get_fireball_direction(self):
-        bird_center_x, bird_center_y = bird.rect.center
-        mario_center_x, mario_center_y = self.rect.center
-        direction_x = bird_center_x - mario_center_x
-        direction_y = bird_center_y - mario_center_y
+        bird_center_x, bird_center_y = config.bird.rect.center
+        THEGODFATHER_center_x, THEGODFATHER_center_y = self.rect.center
+        direction_x = bird_center_x - THEGODFATHER_center_x
+        direction_y = bird_center_y - THEGODFATHER_center_y
         magnitude = (direction_x**2 + direction_y**2)**0.5
         return direction_x / magnitude, direction_y / magnitude
-
 
 print("thegodfather loaded successfully")
 

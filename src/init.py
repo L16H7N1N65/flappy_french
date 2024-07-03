@@ -1,20 +1,21 @@
 import pygame
-from global_vars import WIDTH, HEIGHT
+from global_vars import config
 
 def initialize():
     print("Initializing Pygame...")
     pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    screen = pygame.display.set_mode((config.WIDTH, config.HEIGHT))  # Correct the parameter passing here
     pygame.font.init()
     pygame.mixer.init()
     clock = pygame.time.Clock()
     print("Pygame initialized successfully.")
     return screen, clock
 
-# Call the init $fn when module is loaded
+# Initialize Pygame when the module is loaded
 screen, clock = initialize()
 
 print("init.py loaded and Pygame initialized successfully")
+
 
 '''
 init.py:

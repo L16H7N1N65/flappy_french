@@ -1,10 +1,8 @@
+#assets.py
+
 import pygame
 import sys
-
-pygame.init()
-
-# Set the display mode
-screen = pygame.display.set_mode((800, 600))
+from global_vars import config
 
 def load_images(image_paths, size):
     images = []
@@ -42,6 +40,7 @@ def load_digit_images(digit_images_path):
     return digit_images
 
 print("assets loaded successfully")
+
 
 
 

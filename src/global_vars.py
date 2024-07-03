@@ -1,110 +1,125 @@
-import pygame
-pygame.init()
+#global_vars.py
 
-WIDTH, HEIGHT = 800, 600
-BACKGROUND_COLOR = (112, 197, 206)
-PIPE_COLOR = (46, 213, 115)
+class Config:
+    def __init__(self):
+        import pygame
+        pygame.init()
+        pygame.mixer.init()
 
-AVATAR_BIRDS = [
-    '../assets/birds/bird1.png',
-    '../assets/birds/bird2.png',
-    '../assets/birds/bird3.png',
-    '../assets/birds/bird4.png',
-    '../assets/birds/bird5.png',
-    '../assets/birds/bird6.png',
-    '../assets/birds/bird7.png',
-    '../assets/birds/bird8.png'
-]
+        self.WIDTH, self.HEIGHT = 800, 600
+        self.BACKGROUND_COLOR = (112, 197, 206)
+        
+        self.LOGO_IMAGE_PATH = '../assets/logo.png'
+        self.BACKGROUND_INITIAL_PATH = '../assets/bg_initial.png'
+        self.INITIAL_START_IMAGE_PATH = '../assets/initial_start.png'
 
-ANIMATED_BIRDS = {
-    'bird1': [
-        '../assets/birds/bird1_flap.png',
-        '../assets/birds/bird1_flop.png'
-    ],
-    'bird2': [
-        '../assets/birds/bird2_flap.png',
-        '../assets/birds/bird2_flop.png'
-    ],
-    'bird3': [
-        '../assets/birds/bird3_flap.png',
-        '../assets/birds/bird3_flop.png'
-    ],
-    'bird4': [
-        '../assets/birds/bird4_flap.png',
-        '../assets/birds/bird4_flop.png'
-    ],
-}
+        self.AVATAR_BIRDS = [
+            '../assets/birds/bird1.png',
+            '../assets/birds/bird2.png',
+            '../assets/birds/bird3.png',
+            '../assets/birds/bird4.png',
+            '../assets/birds/bird5.png',
+            '../assets/birds/bird6.png',
+            '../assets/birds/bird7.png',
+            '../assets/birds/bird8.png'
+        ]
 
-BIRD_SELECT_SOUNDS = [
-    '../assets/sounds/select1.wav',
-    '../assets/sounds/select2.wav',
-    '../assets/sounds/select3.wav',
-    '../assets/sounds/select4.wav',
-    '../assets/sounds/select5.wav',
-    '../assets/sounds/select6.wav',
-    '../assets/sounds/select7.wav',
-    '../assets/sounds/select8.wav'
-]
+        self.ANIMATED_BIRDS = {
+            'bird1': [
+                '../assets/birds/bird1_flap.png',
+                '../assets/birds/bird1_flop.png'
+            ],
+            'bird2': [
+                '../assets/birds/bird2_flap.png',
+                '../assets/birds/bird2_flop.png'
+            ],
+            'bird3': [
+                '../assets/birds/bird3_flap.png',
+                '../assets/birds/bird3_flop.png'
+            ],
+            'bird4': [
+                '../assets/birds/bird4_flap.png',
+                '../assets/birds/bird4_flop.png'
+            ],
+        }
 
-BIRD_PASS_PIPE_SOUNDS = [
-    '../assets/sounds/pass_pipe1.wav',
-    '../assets/sounds/pass_pipe2.wav',
-    '../assets/sounds/pass_pipe3.wav',
-    '../assets/sounds/pass_pipe4.wav',
-    '../assets/sounds/pass_pipe5.wav',
-    '../assets/sounds/pass_pipe6.wav',
-    '../assets/sounds/pass_pipe7.wav',
-    '../assets/sounds/pass_pipe8.wav'
-]
+        self.BIRD_SELECT_SOUNDS = [
+            '../assets/sounds/select1.wav',
+            '../assets/sounds/select2.wav',
+            '../assets/sounds/select3.wav',
+            '../assets/sounds/select4.wav',
+            '../assets/sounds/select5.wav',
+            '../assets/sounds/select6.wav',
+            '../assets/sounds/select7.wav',
+            '../assets/sounds/select8.wav'
+        ]
 
-MARIO_SOUND = '../assets/sounds/mario.wav'
-THEGODFATHER_IMAGE_PATH = '../assets/birds/mario.png'
-BALL_IMAGE_PATH = '../assets/birds/ball.png'
-BACKGROUND_MUSIC_PATH = '../assets/sounds/background_music.mp3'
-BACKGROUND_IMAGE_PATH = '../assets/background.png'
-PIPE_IMAGE_PATH = '../assets/pipes/pipe.png'
-DIGIT_IMAGES_PATH = '../assets/digits'
-FLOOR_IMAGE_PATH = '../assets/floor.png'
+        self.BIRD_PASS_PIPE_SOUNDS = [
+            '../assets/sounds/pass_pipe1.wav',
+            '../assets/sounds/pass_pipe2.wav',
+            '../assets/sounds/pass_pipe3.wav',
+            '../assets/sounds/pass_pipe4.wav',
+            '../assets/sounds/pass_pipe5.wav',
+            '../assets/sounds/pass_pipe6.wav',
+            '../assets/sounds/pass_pipe7.wav',
+            '../assets/sounds/pass_pipe8.wav'
+        ]
 
-AVATAR_SIZE = (45, 60)
-BIRD_SIZE = (77, 107)
 
-DIFFICULTIES = {
-    'easy': {'gap': 260, 'pipe_speed': 2},
-    'hard': {'gap': 195, 'pipe_speed': 3},
-    'advanced': {'gap': 130, 'pipe_speed': 4}
-}
+        self.THEGODFATHER_SOUND = '../assets/sounds/thegodfather.wav'
+        self.THEGODFATHER_IMAGE_PATH = '../assets/birds/thegodfather.png'
+        self.BALL_IMAGE_PATH = '../assets/birds/ball.png'
+        self.BACKGROUND_MUSIC_PATH = '../assets/sounds/background_music.mp3'
+        self.BACKGROUND_IMAGE_PATH = '../assets/background.png'
+        
+        self.PIPE_IMAGE_PATH = '../assets/pipes/pipe.png'
+        self.DIGIT_IMAGES_PATH = '../assets/digits'
+        self.FLOOR_IMAGE_PATH = '../assets/floor.png'
+        self.START_IMAGE_PATH = '../assets/start.png'
 
-# Global var initialization
-avatar_birds = []
-bird_select_sounds = []
-bird_pass_pipe_sounds = []
-bird_image = None
-selected_bird_index = 0
-difficulty = ''
-pipes = []
-score = 0
-game_over = False
-popup_active = False
-current_select_sound = None
-bird = None
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.AVATAR_SIZE = (45, 60)
+        self.BIRD_SIZE = (77, 107)
 
-# Blinking related var
-last_blink_time = 0
-blink_speed = 500
+        self.DIFFICULTIES = {
+            'easy': {'gap': 260, 'pipe_speed': 2},
+            'hard': {'gap': 195, 'pipe_speed': 3},
+            'advanced': {'gap': 130, 'pipe_speed': 4}
+        }
 
-font_large = pygame.font.SysFont('Arial', 50)
-font_medium = pygame.font.SysFont('Arial', 30)
-font_small = pygame.font.SysFont('Arial', 15)
+        # Global var initialization
+        self.avatar_birds = []
+        self.bird_select_sounds = []
+        self.bird_pass_pipe_sounds = []
+        self.thegodfather = []
+        self.bird_image = None
+        self.selected_bird_index = 0
+        self.difficulty = ''
+        self.pipes = []
+        self.score = 0
+        self.game_over = False
+        self.popup_active = False
+        self.current_select_sound = None
+        self.bird = None
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
 
-# Sprites
-all_sprites = pygame.sprite.Group()
-pipes_group = pygame.sprite.Group()
-thegodfather_group = pygame.sprite.Group()
-balls_group = pygame.sprite.Group()
+        # Blinking related var
+        self.last_blink_time = 0
+        self.blink_speed = 500
 
-print("global_vars loaded successfully")
+        self.font_large = pygame.font.SysFont('Arial', 50)
+        self.font_medium = pygame.font.SysFont('Arial', 30)
+        self.font_small = pygame.font.SysFont('Arial', 15)
+
+        # Sprites
+        self.all_sprites = pygame.sprite.Group()
+        self.pipes_group = pygame.sprite.Group()
+        self.thegodfather_group = pygame.sprite.Group()
+        self.balls_group = pygame.sprite.Group()
+
+        print("global_vars loaded successfully")
+
+config = Config()
+
 
 
 
