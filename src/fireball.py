@@ -5,9 +5,9 @@ class Fireball(pygame.sprite.Sprite):
     def __init__(self, initial_position, direction):
         super().__init__()
         self.image = pygame.image.load(config.BALL_IMAGE_PATH).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (70, 70))
+        self.image = pygame.transform.scale(self.image, (80, 80))
         self.rect = self.image.get_rect(center=initial_position)
-        self.speed = 5
+        self.speed = 10
         self.direction = direction
 
     def update(self):

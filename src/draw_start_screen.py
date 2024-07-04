@@ -17,7 +17,7 @@ logo_scaled = pygame.transform.scale(logo, (logo.get_width() // 1.6, logo.get_he
 print("Logo image loaded and scaled.")
 
 initial_start = pygame.image.load(config.INITIAL_START_IMAGE_PATH).convert_alpha()
-initial_start_scaled = pygame.transform.scale(initial_start, (initial_start.get_width() // 1.4, initial_start.get_height() // 1.4))
+initial_start_scaled = pygame.transform.scale(initial_start, (initial_start.get_width() // 1.2, initial_start.get_height() // 1.2))
 print("Initial start image loaded and scaled.")
 
 def draw_start_screen(screen, blink):

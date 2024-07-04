@@ -30,7 +30,6 @@ def generate_pipes():
     if config.difficulty not in config.DIFFICULTIES:
         print(f"Error 28: Difficulty '{config.difficulty}' not found in DIFFICULTIES! pipe.py")
         return
-    print(f"ligne 30 pipe.py difficulty = {config.difficulty}")
     gap = config.DIFFICULTIES[config.difficulty]['gap']
     pipe_speed = config.DIFFICULTIES[config.difficulty]['pipe_speed']
     last_pipe = config.pipes[-1] if config.pipes else None
@@ -42,11 +41,10 @@ def generate_pipes():
         config.pipes.extend([pipe_top, pipe_bottom])
         config.pipes_group.add(pipe_top, pipe_bottom)
 
-        if len(config.pipes) // 2 % 4 == 0:
-            thegodfather = TheGodfather(config.thegodfather_group, config.all_sprites, config.WIDTH, pipe_bottom.rect.top + pipe_bottom.rect.height)
+        if len(config.pipes) // 2 % 10 == 0:  # The Godfather appears every 5 pipes
+            thegodfather = TheGodfather(config.thegodfather_group, config.all_sprites, config.WIDTH - 50, pipe_bottom.rect.top + pipe_bottom.rect.height)
             config.all_sprites.add(thegodfather)
             config.thegodfather_group.add(thegodfather)
-            config.THEGODFATHER_SOUND.play()
 
     config.pipes_group.update()
 
@@ -69,6 +67,11 @@ def set_difficulty(difficulty_level):
     start_game()
 
 print("pipe loaded successfully")
+
+
+
+
+
 
 
 

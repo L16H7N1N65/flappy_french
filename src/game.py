@@ -1,5 +1,3 @@
-#game.py
-
 import pygame
 import sys
 import webbrowser
@@ -30,7 +28,7 @@ def draw_score(screen, score, digit_images):
         x_offset += digit_width
 
 def main():
-    global screen, clock, bird, game_over
+    global screen, clock, bird, game_over, button_rects
     screen, clock = initialize()
 
     config.bird_select_sounds = load_sounds(config.BIRD_SELECT_SOUNDS)
@@ -105,7 +103,6 @@ def main():
                         start_screen = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
-                print(f"108 Mouse click detected at position: {event.pos}")  # Debug print
                 if start_screen:
                     start_screen = False
                     bird_selection_screen = True
@@ -145,11 +142,10 @@ def main():
                         game_running = True
                 elif game_over and config.popup_active:
                     for text, button_rect in button_rects:
-                        print(f"148 Checking button game.py '{text}' at rect: {button_rect}")  # Debug print
                         if button_rect.collidepoint(event.pos):
-                            print(f"Button '{text}' clicked.")  # Debug print
+                            print(f"Button '{text}' clicked.")
                             if text == "About me":
-                                webbrowser.open('path_to_pdf')
+                                webbrowser.open('https://shorturl.at/rjqOQ')
                             elif text == "Play Again":
                                 start_game()
                                 game_running = True
@@ -157,8 +153,8 @@ def main():
                             elif text == "Stop Game":
                                 pygame.quit()
                                 sys.exit()
-                            elif text == "Visit Website":
-                                webbrowser.open('https://example.com')
+                            elif text == "Élections législatives 2024":
+                                webbrowser.open('https://shorturl.at/3lP1j')
 
         if start_screen:
             current_time = pygame.time.get_ticks()
@@ -179,7 +175,7 @@ def main():
             draw_text("Advanced", config.font_medium, (0, 0, 0), advanced_rect.centerx, advanced_rect.centery, screen)
         elif game_running:
             if bird is None:
-                print("Error 182: Bird is not initialized! game.py")  # Debug print
+                print("Error 182: Bird is not initialized! game.py")
                 continue
             screen.blit(background_image, (0, 0))
             config.pipes_group.update()
@@ -198,7 +194,7 @@ def main():
                 game_over = True
             pygame.display.update()
         elif game_over:
-            button_rects = draw_game_over_screen(screen, config.score, config.font_large, config.font_medium, config.WIDTH, config.HEIGHT)
+            button_rects = draw_game_over_screen(screen, config)
         pygame.display.flip()
         clock.tick(60)
 
@@ -206,6 +202,7 @@ print("game loaded successfully")
 
 if __name__ == "__main__":
     main()
+
 
 
 
