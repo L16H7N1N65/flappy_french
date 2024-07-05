@@ -1,5 +1,3 @@
-# bird.py
-
 import pygame
 from global_vars import config
 from assets import load_images, load_sounds
@@ -36,8 +34,11 @@ class Bird(pygame.sprite.Sprite):
         if self.rect.top <= 0:
             self.rect.top = 0
             self.velocity = 0
-        elif self.rect.bottom >= config.HEIGHT:
-            self.rect.bottom = config.HEIGHT
+
+        # Ensure the bird stays above the floor
+        floor_y = config.HEIGHT - config.floor.height
+        if self.rect.bottom >= floor_y:
+            self.rect.bottom = floor_y
             self.velocity = 0
 
         if self.is_jumping:
@@ -56,6 +57,10 @@ class Bird(pygame.sprite.Sprite):
         if self.bird_type in self.animated_images:
             self.current_image_index = (self.current_image_index + 1) % len(self.animated_images[self.bird_type])
             self.image = pygame.transform.scale(self.animated_images[self.bird_type][self.current_image_index], (74, 94))
+
+    def show_animation(self):
+        # Add pixel celebration animation
+        pass
 
     def play_select_sound(self):
         self.select_sound.play()

@@ -7,10 +7,11 @@ from assets import load_images, load_sounds, load_digit_images
 from init import initialize
 from global_vars import config
 from draw_start_screen import draw_start_screen
-from game_over import draw_game_over_screen
+from game_over import draw_game_over_screen, play_video_on_screen
 from font import draw_text
 from thegodfather import TheGodfather
 from start_game import start_game
+from floor import Floor
 
 digit_images = load_digit_images(config.DIGIT_IMAGES_PATH)
 score = check_score
@@ -42,10 +43,9 @@ def main():
     background_image = pygame.image.load(config.BACKGROUND_IMAGE_PATH).convert()
     background_image = pygame.transform.scale(background_image, (config.WIDTH, config.HEIGHT))
 
-    floor_image = pygame.image.load(config.FLOOR_IMAGE_PATH).convert_alpha()
-    floor_height = floor_image.get_height() // 10
-    floor_image = pygame.transform.scale(floor_image, (config.WIDTH, floor_height))
-    floor_x = 0
+    # Initialize and configure floor
+    floor = Floor(config.FLOOR_IMAGE_PATH, config.WIDTH, config.HEIGHT)
+    config.floor = floor
 
     start_screen = True
     bird_selection_screen = False
@@ -116,14 +116,18 @@ def main():
                         if button_x <= x <= button_x + button_width and button_y <= y <= button_y + button_height:
                             selected_bird_index = i
                             bird = select_bird(selected_bird_index)
-                            print(f"122 Bird selected at index {selected_bird_index}: {bird}")
+                            print(f"Bird selected at index {selected_bird_index}: {bird}")
                     start_img_rect = pygame.Rect((config.WIDTH // 2 - button_width // 2, config.HEIGHT - 100, button_width, button_height))
                     if start_img_rect.collidepoint(event.pos):
                         if bird is not None:
+                            if config.current_select_sound:
+                                config.current_select_sound.stop()
+                            start_sound = pygame.mixer.Sound(config.START_SOUND_PATH)
+                            start_sound.play()
                             bird_selection_screen = False
                             difficulty_screen = True
                         else:
-                            print("129 Start button clicked, but bird is not initialized.")
+                            print("Start button clicked, but bird is not initialized.")
                 elif difficulty_screen:
                     easy_rect = pygame.Rect(config.WIDTH // 4, config.HEIGHT // 2 - 30, config.WIDTH // 2, 60)
                     hard_rect = pygame.Rect(config.WIDTH // 4, config.HEIGHT // 2 + 40, config.WIDTH // 2, 60)
@@ -153,8 +157,10 @@ def main():
                             elif text == "Stop Game":
                                 pygame.quit()
                                 sys.exit()
-                            elif text == "Élections législatives 2024":
+                            elif text == "Élections 24":
                                 webbrowser.open('https://shorturl.at/3lP1j')
+                            elif text == "Link":
+                                webbrowser.open('https://example.com')  # Add the actual URL here
 
         if start_screen:
             current_time = pygame.time.get_ticks()
@@ -175,26 +181,31 @@ def main():
             draw_text("Advanced", config.font_medium, (0, 0, 0), advanced_rect.centerx, advanced_rect.centery, screen)
         elif game_running:
             if bird is None:
-                print("Error 182: Bird is not initialized! game.py")
+                print("Error: Bird is not initialized!")
                 continue
             screen.blit(background_image, (0, 0))
             config.pipes_group.update()
             config.pipes_group.draw(screen)
-            floor_x -= 2
-            if floor_x <= -config.WIDTH:
-                floor_x = 0
-            screen.blit(floor_image, (floor_x, config.HEIGHT - floor_height))
-            screen.blit(floor_image, (floor_x + config.WIDTH, config.HEIGHT - floor_height))
+            config.votes_group.update()
+            config.votes_group.draw(screen)
+            floor.update()
+            floor.draw(screen)
             config.all_sprites.update()
             config.all_sprites.draw(screen)
             generate_pipes()
             draw_score(screen, config.score, digit_images)
+            for i in range(0, len(config.pipes), 2):
+                check_score(config.pipes[i], config.pipes[i + 1], bird)
             if pygame.sprite.spritecollideany(bird, config.pipes_group) or pygame.sprite.spritecollideany(bird, config.balls_group):
                 game_running = False
                 game_over = True
+            
             pygame.display.update()
-        elif game_over:
-            button_rects = draw_game_over_screen(screen, config)
+        if game_over:
+            button_rects, link_button_rect = draw_game_over_screen(screen, config)
+            if config.video_frames:
+                play_video_on_screen(screen, config.video_frames)
+
         pygame.display.flip()
         clock.tick(60)
 
@@ -202,11 +213,6 @@ print("game loaded successfully")
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
 
 
 

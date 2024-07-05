@@ -1,5 +1,3 @@
-#global_vars.py
-
 class Config:
     def __init__(self):
         import pygame
@@ -65,7 +63,7 @@ class Config:
             '../assets/sounds/pass_pipe8.wav'
         ]
 
-
+        self.VOTE_PATH = '../assets/vote.png'
         self.THEGODFATHER_SOUND = '../assets/sounds/thegodfather.wav'
         self.THEGODFATHER_IMAGE_PATH = '../assets/birds/thegodfather.png'
         self.BALL_IMAGE_PATH = '../assets/birds/ball.png'
@@ -76,6 +74,14 @@ class Config:
         self.DIGIT_IMAGES_PATH = '../assets/digits'
         self.FLOOR_IMAGE_PATH = '../assets/floor.png'
         self.START_IMAGE_PATH = '../assets/start.png'
+        self.START_SOUND_PATH = '../assets/sounds/start.wav'
+
+        self.BIRD_VIDEOS = {
+            'bird1': '../assets/videos/bird1.mp4',
+            'bird2': '../assets/videos/bird2.mp4',
+            'bird3': '../assets/videos/bird3.mp4',
+            'bird4': '../assets/videos/bird4.mp4'
+        }
 
         self.AVATAR_SIZE = (45, 60)
         self.BIRD_SIZE = (77, 107)
@@ -110,13 +116,12 @@ class Config:
         self.font_medium = pygame.font.SysFont('Arial', 30)
         self.font_small = pygame.font.SysFont('Arial', 15)
 
-        # Sprites
+        # Sprites group
         self.all_sprites = pygame.sprite.Group()
         self.pipes_group = pygame.sprite.Group()
-        self.thegodfather_group = pygame.sprite.Group()
+        self.votes_group = pygame.sprite.Group()
         self.balls_group = pygame.sprite.Group()
-
-        print("global_vars loaded successfully")
+        self.thegodfather_group = pygame.sprite.Group()
 
 config = Config()
 

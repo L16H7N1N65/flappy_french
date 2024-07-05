@@ -1,5 +1,3 @@
-#select_bird.py
-
 import pygame
 from global_vars import config
 from assets import load_images, load_sounds
@@ -79,6 +77,7 @@ def draw_bird_selection_screen(screen, avatar_birds):
     return start_img_rect
 
 print("select_bird.py loaded successfully")
+
 
 
 
