@@ -1,9 +1,10 @@
 import pygame
 import os
 import webbrowser
+import tempfile  # For creating temporary audio files verrrrrryyyy important in python lol
 from font import draw_text
 from global_vars import config
-from moviepy.editor import VideoFileClip, AudioFileClip
+from moviepy.editor import VideoFileClip
 from moviepy.video.fx.resize import resize
 
 def draw_game_over_screen(screen, config):
@@ -23,7 +24,6 @@ def draw_game_over_screen(screen, config):
         try:
             clip = VideoFileClip(video_path)
             clip = resize(clip, width=320, height=240)  # Resize to a fixed size
-            config.audio_clip = AudioFileClip(video_path)  # Extract audio
 
             # Extract video frames
             for frame in clip.iter_frames(fps=24):
@@ -31,14 +31,20 @@ def draw_game_over_screen(screen, config):
                 frames.append(frame_surface)
             config.video_frames = frames  # Store the frames for display
 
-            # Save audio to a temporary file
-            temp_audio_path = "temp_audio.wav"
-            config.audio_clip.write_audiofile(temp_audio_path)
-
-            # Load and play the audio using Pygame mixer
+             # Prepare a unique temporary audio file
+            temp_audio_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
+            temp_audio_path = temp_audio_file.name
+            temp_audio_file.close() 
+            # Save the audio to the temporary file
+            clip.audio.write_audiofile(temp_audio_path, fps=44100, codec="pcm_s16le")
+            # Load and play audio
             pygame.mixer.music.load(temp_audio_path)
             pygame.mixer.music.play()
 
+        except PermissionError:
+            print("Permission denied when trying to write audio file. Please check file permissions.")
+        except OSError as e:
+            print(f"OS error occurred: {e}")
         except Exception as e:
             print(f"Error: Could not load video for {bird_type} - {str(e)}")
     else:
@@ -48,8 +54,8 @@ def draw_game_over_screen(screen, config):
     if frames:
         video_frame_width = 320
         video_frame_height = 240
-        video_frame_x = (config.WIDTH * 1 // 6)  # Center horizontally in the first two-thirds of the screen
-        video_frame_y = config.HEIGHT // 4 + 30  # Slightly lower position
+        video_frame_x = (config.WIDTH // 2 - video_frame_width // 2)  # Center horizontally
+        video_frame_y = (config.HEIGHT // 2 - video_frame_height // 2)  # Center vertically
 
         # Draw the black border around the video frame
         video_border_rect = pygame.Rect(video_frame_x - 5, video_frame_y - 5, video_frame_width + 10, video_frame_height + 10)
@@ -71,34 +77,47 @@ def draw_game_over_screen(screen, config):
     button_width = config.WIDTH // 5
     button_height = 50
     button_spacing = 20
-    start_x = config.WIDTH * 2 // 3
+    start_x_left = config.WIDTH // 6 - button_width // 2
+    start_x_right = config.WIDTH * 5 // 6 - button_width // 2
     start_y = config.HEIGHT // 3
 
     buttons = [
-        ("About me", start_x),
-        ("Play Again", start_x),
-        ("Stop Game", start_x),
-        ("Élections 24", start_x)
+        ("About me", start_x_left, (0, 255, 0)),
+        ("Play Again", start_x_left, (0, 255, 0)),
+        ("Stop Game", start_x_left, (0, 255, 0)),
+        ("Play Video", start_x_right, (255, 0, 0)),
+        ("Pause", start_x_right, (255, 0, 0)),
+        ("Élections 24", start_x_right, (255, 0, 0))
     ]
 
     button_rects = []
-    for idx, (text, button_x) in enumerate(buttons):
-        button_rect = pygame.Rect(button_x, start_y + idx * (button_height + button_spacing), button_width, button_height)
-        pygame.draw.rect(screen, (255, 0, 0), button_rect)
+    for idx, (text, button_x, color) in enumerate(buttons):
+        button_rect = pygame.Rect(button_x, start_y + idx % 3 * (button_height + button_spacing), button_width, button_height)
+        pygame.draw.rect(screen, color, button_rect)
         draw_text(text, config.font_medium, (255, 255, 255), button_rect.centerx, button_rect.centery, screen)
         button_rects.append((text, button_rect))
 
     pygame.display.update()
     print("Game over screen drawn with buttons:", buttons)
-    return button_rects, link_button_rect if frames else None
+    return button_rects, link_button_rect if frames else (button_rects, None)
 
-def play_video_on_screen(screen, frames, pos=(50, 150)):
+def play_video_on_screen(screen, frames, pos=None):
+    if pos is None:
+        pos = (config.WIDTH // 2 - frames[0].get_width() // 2, config.HEIGHT // 2 - frames[0].get_height() // 2)
+
     for frame in frames:
         screen.blit(frame, pos)
         pygame.display.update()
-        pygame.time.wait(int(1000 / 24))  # Adjust this to match the frame rate of the video
+        pygame.time.wait(int(1000 / 24))  # Delay for 24 fps
 
 print("game_over.py loaded successfully")
+
+
+
+
+
+
+
 
 
 

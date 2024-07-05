@@ -29,7 +29,7 @@ def draw_score(screen, score, digit_images):
         x_offset += digit_width
 
 def main():
-    global screen, clock, bird, game_over, button_rects
+    global screen, clock, bird, game_over, button_rects, link_button_rect
     screen, clock = initialize()
 
     config.bird_select_sounds = load_sounds(config.BIRD_SELECT_SOUNDS)
@@ -46,6 +46,10 @@ def main():
     # Initialize and configure floor
     floor = Floor(config.FLOOR_IMAGE_PATH, config.WIDTH, config.HEIGHT)
     config.floor = floor
+    
+    
+    bird_number = None
+    url = config.bird_links.get(bird_number)
 
     start_screen = True
     bird_selection_screen = False
@@ -77,10 +81,10 @@ def main():
                             bird_selection_screen = False
                             difficulty_screen = True
                         else:
-                            print("Error82: Bird is not initialized!")
+                            print("Error: Bird is not initialized!")
                 elif difficulty_screen:
                     if bird is None:
-                        print("Error 85: Bird is not initialized!")
+                        print("Error: Bird is not initialized!")
                         continue
                     if event.key == pygame.K_UP:
                         set_difficulty('easy')
@@ -97,10 +101,6 @@ def main():
                 elif game_running:
                     if event.key == pygame.K_SPACE:
                         bird.jump()
-                elif game_over and config.popup_active:
-                    if event.key == pygame.K_RETURN:
-                        config.popup_active = False
-                        start_screen = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
                 if start_screen:
@@ -151,17 +151,23 @@ def main():
                             if text == "About me":
                                 webbrowser.open('https://shorturl.at/rjqOQ')
                             elif text == "Play Again":
-                                start_game()
-                                game_running = True
+                                # Reset game state and start a new game
                                 config.popup_active = False
+                                game_over = False
+                                game_running = True
+                                start_game()  # Restart the game logic
                             elif text == "Stop Game":
                                 pygame.quit()
                                 sys.exit()
                             elif text == "Élections 24":
                                 webbrowser.open('https://shorturl.at/3lP1j')
+                            elif text == "Play Video":
+                                config.video_playing = True
+                            elif text == "Pause":
+                                config.video_playing = False
                             elif text == "Link":
-                                webbrowser.open('https://example.com')  # Add the actual URL here
-
+                                webbrowser.open(url)
+                                    
         if start_screen:
             current_time = pygame.time.get_ticks()
             if current_time - config.last_blink_time >= config.blink_speed:
@@ -203,16 +209,24 @@ def main():
             pygame.display.update()
         if game_over:
             button_rects, link_button_rect = draw_game_over_screen(screen, config)
-            if config.video_frames:
-                play_video_on_screen(screen, config.video_frames)
+            if config.video_frames and config.video_playing:
+                play_video_on_screen(screen, config.video_frames, (config.WIDTH // 2 - 160, config.HEIGHT // 4 + 30))
 
         pygame.display.flip()
         clock.tick(60)
 
-print("game loaded successfully")
+    print("game loaded successfully")
 
-if __name__ == "__main__":
-    main()
+    if __name__ == "__main__":
+        main()
+
+
+
+
+
+
+
+
 
 
 

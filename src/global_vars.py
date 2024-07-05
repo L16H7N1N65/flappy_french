@@ -3,7 +3,8 @@ class Config:
         import pygame
         pygame.init()
         pygame.mixer.init()
-
+        self.video_playing = False
+        self.video_pause = False
         self.WIDTH, self.HEIGHT = 800, 600
         self.BACKGROUND_COLOR = (112, 197, 206)
         
@@ -21,6 +22,21 @@ class Config:
             '../assets/birds/bird7.png',
             '../assets/birds/bird8.png'
         ]
+        
+        self.bird_links = {
+            'bird1': [
+                'https://parti-renaissance.fr',
+        ],
+        'bird2': [
+            'https://mlafrance.fr/programme',
+        ],
+        'bird3': [
+            'https://melenchon2022.fr/programme',
+        ],
+        'bird4': [
+            'https://programme.ericzemmour.fr',
+        ],
+    }
 
         self.ANIMATED_BIRDS = {
             'bird1': [
