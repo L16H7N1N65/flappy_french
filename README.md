@@ -37,6 +37,9 @@ Ce jeu a été développé par L16H7N1N65 https://github.com/L16H7N1N65/flappy_f
 
 ## Avertissement
 Ce jeu est une simulation inspirée d'événements réels mais n'a aucune intention politique ou partisane. Il est destiné uniquement à des fins éducatives et de pratique du développement logiciel.
+
+
+
 """
     Flappy French Game
     Copyright (C) 2024  L16H7N1N65
