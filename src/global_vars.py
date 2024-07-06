@@ -26,17 +26,17 @@ class Config:
         self.bird_links = {
             'bird1': [
                 'https://parti-renaissance.fr',
-        ],
-        'bird2': [
-            'https://mlafrance.fr/programme',
-        ],
-        'bird3': [
-            'https://melenchon2022.fr/programme',
-        ],
-        'bird4': [
-            'https://programme.ericzemmour.fr',
-        ],
-    }
+            ],
+            'bird2': [
+                'https://mlafrance.fr/programme',
+            ],
+            'bird3': [
+                'https://melenchon2022.fr/programme',
+            ],
+            'bird4': [
+                'https://programme.ericzemmour.fr',
+            ],
+        }
 
         self.ANIMATED_BIRDS = {
             'bird1': [
