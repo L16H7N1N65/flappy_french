@@ -37,3 +37,22 @@ Ce jeu a été développé par L16H7N1N65 https://github.com/L16H7N1N65/flappy_f
 
 ## Avertissement
 Ce jeu est une simulation inspirée d'événements réels mais n'a aucune intention politique ou partisane. Il est destiné uniquement à des fins éducatives et de pratique du développement logiciel.
+"""
+    Flappy French Game
+    Copyright (C) 2024  L16H7N1N65
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+    You can contact me at linda.meghouche@gmail.com
+"""
