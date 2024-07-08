@@ -1,6 +1,11 @@
 # Flappy French
 
+<div align="center">
+  
 https://github.com/L16H7N1N65/flappy_french/assets/79063770/4f5e3896-c291-4594-a78d-1aee0e9ab35c
+
+</div>
+
 
 ## Introduction
 Flappy French est un jeu développé à des fins éducatives et pour pratiquer le développement logiciel. Il s'inspire des élections législatives suivant la dissolution du gouvernement par le Président de la République. Le jeu ne véhicule aucun message politique ni affiliation, mais utilise ce scénario comme toile de fond pour exercer des compétences techniques.
