@@ -59,4 +59,4 @@ Ce jeu est une simulation inspirée d'événements réels mais n'a aucune intent
 
     You can contact me at linda.meghouche@gmail.com
 """
->>>>>>> origin/gh-pages
+
